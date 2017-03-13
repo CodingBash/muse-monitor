@@ -1,7 +1,7 @@
 package com.codingbash.musemonitor.socketserver;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.web.support.SpringBootServletInitializer;
+import org.springframework.boot.context.web.SpringBootServletInitializer;
 
 public class ServletInitializer extends SpringBootServletInitializer {
 
