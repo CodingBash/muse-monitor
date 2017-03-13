@@ -1,27 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_user"
+    android:id="@+id/activity_patient"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.codingbash.muse_monitor_android.UserActivity">
+    tools:context="com.codingbash.muse_monitor_android.PatientActivity">
 
-    <TextView
+    <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        android:id="@+id/textView" />
+        android:inputType="textPersonName"
+        android:text="Patient ID"
+        android:ems="10"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="190dp"
+        android:id="@+id/patient_id_field" />
 
     <Button
-        android:text="Patient"
+        android:text="Submit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textView"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="185dp"
-        android:id="@+id/patient_button" />
+        android:layout_marginTop="47dp"
+        android:id="@+id/patient_id_submit"
+        android:layout_below="@+id/patient_id_field"
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>
