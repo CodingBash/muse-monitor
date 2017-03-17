@@ -2,8 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.codingbash.muse_monitor_android">
 
+    <!-- Test -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -20,7 +23,6 @@
         </activity>
         <activity android:name=".PatientActivity" />
         <activity android:name=".StreamingActivity" />
-        <activity android:name=".StreamingActivity"></activity>
     </application>
 
 </manifest>
