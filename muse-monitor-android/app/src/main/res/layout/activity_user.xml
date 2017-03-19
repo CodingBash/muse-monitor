@@ -8,7 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.codingbash.muse_monitor_android.UserActivity">
+    tools:context="com.codingbash.muse_monitor_android.activity.UserActivity">
 
     <TextView
         android:layout_width="wrap_content"

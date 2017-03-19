@@ -8,7 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.codingbash.muse_monitor_android.PatientActivity">
+    tools:context="com.codingbash.muse_monitor_android.activity.PatientActivity">
 
     <EditText
         android:id="@+id/patient_id_field"
@@ -19,7 +19,7 @@
         android:layout_marginTop="190dp"
         android:ems="10"
         android:inputType="textPersonName"
-        android:text="Patient ID" />
+        android:hint="Patient ID" />
 
     <Button
         android:text="Submit"

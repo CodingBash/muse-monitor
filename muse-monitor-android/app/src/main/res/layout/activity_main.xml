@@ -7,25 +7,45 @@
         android:id="@+id/muses_spinner"
         android:layout_width="match_parent"
         android:layout_height="60dp" />
+
+    <!-- Connection Buttons -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:orientation="horizontal" >
-        <Button
-            android:id="@+id/refresh"
-            android:layout_width="100dp"
-            android:layout_height="40dp"
-            android:text="@string/refresh" />
-        <Button
-            android:id="@+id/connect"
-            android:layout_width="100dp"
-            android:layout_height="40dp"
-            android:text="@string/connect" />
-        <Button
-            android:id="@+id/disconnect"
-            android:layout_width="120dp"
-            android:layout_height="40dp"
-            android:text="@string/disconnect" />
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/refresh"
+                android:layout_width="100dp"
+                android:layout_height="40dp"
+                android:text="@string/refresh" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/connect"
+                android:layout_width="100dp"
+                android:layout_height="40dp"
+                android:text="@string/connect" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/disconnect"
+                android:layout_width="120dp"
+                android:layout_height="40dp"
+                android:text="@string/disconnect" />
+        </LinearLayout>
     </LinearLayout>
     <TextView
         android:layout_width="match_parent"
@@ -46,6 +66,8 @@
         android:layout_weight="1"
         android:textSize="16sp"
         android:text="@string/eeg" />
+
+    <!-- EEG DATA -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -80,6 +102,8 @@
             android:textSize="16sp"
             android:text="@string/init_val" />
     </LinearLayout>
+
+    <!-- ACCELL DATA -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -113,6 +137,8 @@
             android:textSize="16sp"
             android:text="@string/init_val" />
     </LinearLayout>
+
+    <!-- ALPHA DATA -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -140,13 +166,6 @@
             android:text="@string/init_val" />
         <TextView
             android:id="@+id/elem3"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:textSize="16sp"
-            android:text="@string/init_val" />
-        <TextView
-            android:id="@+id/elem4"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"

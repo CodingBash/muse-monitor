@@ -3,7 +3,7 @@
  * Interaxon, Inc. 2016
  */
 
-package com.codingbash.muse_monitor_android;
+package com.codingbash.muse_monitor_android.activity;
 
 import android.Manifest;
 import android.app.Activity;
@@ -29,6 +29,7 @@ import com.choosemuse.libmuse.Accelerometer;
 import com.choosemuse.libmuse.AnnotationData;
 import com.choosemuse.libmuse.ConnectionState;
 import com.choosemuse.libmuse.Eeg;
+import com.choosemuse.libmuse.Gyro;
 import com.choosemuse.libmuse.LibmuseVersion;
 import com.choosemuse.libmuse.MessageType;
 import com.choosemuse.libmuse.Muse;
@@ -47,6 +48,7 @@ import com.choosemuse.libmuse.MuseManagerAndroid;
 import com.choosemuse.libmuse.MuseVersion;
 import com.choosemuse.libmuse.Result;
 import com.choosemuse.libmuse.ResultLevel;
+import com.codingbash.muse_monitor_android.R;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -132,6 +134,8 @@ public class StreamingActivity extends Activity implements OnClickListener {
     private boolean alphaStale;
     private final double[] accelBuffer = new double[3];
     private boolean accelStale;
+    private final double[] gyroBuffer = new double[3];
+    private boolean gyroState;
 
     /**
      * We will be updating the UI using a handler instead of in packet handlers because
@@ -262,6 +266,7 @@ public class StreamingActivity extends Activity implements OnClickListener {
                 muse.registerDataListener(dataListener, MuseDataPacketType.BATTERY);
                 muse.registerDataListener(dataListener, MuseDataPacketType.DRL_REF);
                 muse.registerDataListener(dataListener, MuseDataPacketType.QUANTIZATION);
+                muse.registerDataListener(dataListener, MuseDataPacketType.GYRO);
 
                 // Initiate a connection to the headband and stream the data asynchronously.
                 muse.runAsynchronously();
@@ -423,6 +428,11 @@ public class StreamingActivity extends Activity implements OnClickListener {
                 getEegChannelValues(alphaBuffer,p);
                 alphaStale = true;
                 break;
+            case GYRO:
+                assert(gyroBuffer.length >= n);
+                getGyroValues(p);
+                gyroState = true;
+                break;
             case BATTERY:
             case DRL_REF:
             case QUANTIZATION:
@@ -466,6 +476,12 @@ public class StreamingActivity extends Activity implements OnClickListener {
         accelBuffer[2] = p.getAccelerometerValue(Accelerometer.Z);
     }
 
+    private void getGyroValues(MuseDataPacket p){
+        gyroBuffer[0] = p.getGyroValue(Gyro.X);
+        gyroBuffer[1] = p.getGyroValue(Gyro.Y);
+        gyroBuffer[2] = p.getGyroValue(Gyro.Z);
+
+    }
 
     //--------------------------------------
     // UI Specific methods
@@ -507,8 +523,8 @@ public class StreamingActivity extends Activity implements OnClickListener {
             if (accelStale) {
                 updateAccel();
             }
-            if (alphaStale) {
-                updateAlpha();
+            if (gyroState) {
+                updateGyro();
             }
             handler.postDelayed(tickUi, 1000 / 60);
         }
@@ -527,6 +543,15 @@ public class StreamingActivity extends Activity implements OnClickListener {
         acc_z.setText(String.format("%6.2f", accelBuffer[2]));
     }
 
+    private void updateGyro() {
+        TextView elem1 = (TextView)findViewById(R.id.elem1);
+        elem1.setText(String.format("%6.2f", gyroBuffer[0]));
+        TextView elem2 = (TextView)findViewById(R.id.elem2);
+        elem2.setText(String.format("%6.2f", gyroBuffer[1]));
+        TextView elem3 = (TextView)findViewById(R.id.elem3);
+        elem3.setText(String.format("%6.2f", gyroBuffer[2]));
+    }
+
     private void updateEeg() {
         TextView tp9 = (TextView)findViewById(R.id.eeg_tp9);
         TextView fp1 = (TextView)findViewById(R.id.eeg_af7);
@@ -538,6 +563,7 @@ public class StreamingActivity extends Activity implements OnClickListener {
         tp10.setText(String.format("%6.2f", eegBuffer[3]));
     }
 
+    /*
     private void updateAlpha() {
         TextView elem1 = (TextView)findViewById(R.id.elem1);
         elem1.setText(String.format("%6.2f", alphaBuffer[0]));
@@ -548,7 +574,7 @@ public class StreamingActivity extends Activity implements OnClickListener {
         TextView elem4 = (TextView)findViewById(R.id.elem4);
         elem4.setText(String.format("%6.2f", alphaBuffer[3]));
     }
-
+*/
 
     //--------------------------------------
     // File I/O
