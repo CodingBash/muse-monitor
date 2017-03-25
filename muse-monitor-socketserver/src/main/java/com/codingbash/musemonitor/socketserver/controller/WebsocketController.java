@@ -12,8 +12,8 @@ import com.codingbash.musemonitor.socketserver.model.PhysicalStatus;
 @Controller
 public class WebsocketController {
 	
-	@MessageMapping("/payload")
-	@SendTo("/topic/payload")
+	@MessageMapping("/muse-payload")
+	@SendTo("/topic/muse-indicator")
 	public OutboundPayload payload(InboundPayload inboundPayload) throws Exception {
 		Thread.sleep(1000);
 		OutboundPayload outboundPayload = new OutboundPayload();
