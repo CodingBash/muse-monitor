@@ -12,12 +12,23 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry config) {
-		config.enableSimpleBroker("/topic");
+		/*
+		 * Endpoint to broadcast to subscribers of the WS
+		 */
+		config.enableSimpleBroker("/topic", "/queue");
+		
+		/*
+		 * Endpoint to send to WS controller for application work
+		 */
 		config.setApplicationDestinationPrefixes("/app");
 	}
 
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
-		registry.addEndpoint("/muse-ws").withSockJS();
+		/*
+		 * This is the endpoint where clients register their WS client
+		 * Allowing any origin
+		 */
+		registry.addEndpoint("/muse-ws").setAllowedOrigins("*").withSockJS();
 	}
 }

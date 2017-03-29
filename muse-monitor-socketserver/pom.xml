@@ -10,7 +10,6 @@
 
 	<name>muse-monitor-socketserver</name>
 	<description>Muse Monitor Socket Server</description>
-
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
