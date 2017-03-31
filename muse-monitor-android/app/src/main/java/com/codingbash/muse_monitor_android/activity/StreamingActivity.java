@@ -602,12 +602,12 @@ public class StreamingActivity extends Activity implements OnClickListener {
                 buffer[5] = p.getEegChannelValue(Eeg.AUX_RIGHT);
                 */
             eegPacket = new EegPacket();
-            eegPacket.setEeg1(eegBuffer[0]);
-            eegPacket.setEeg2(eegBuffer[1]);
-            eegPacket.setEeg3(eegBuffer[2]);
-            eegPacket.setEeg4(eegBuffer[3]);
-            eegPacket.setAuxLeft(eegBuffer[4]);
-            eegPacket.setAuxRight(eegBuffer[5]);
+            eegPacket.setEeg1(Double.isNaN(eegBuffer[0]) ? -1 : eegBuffer[0]);
+            eegPacket.setEeg2(Double.isNaN(eegBuffer[1]) ? -1 : eegBuffer[1]);
+            eegPacket.setEeg3(Double.isNaN(eegBuffer[2]) ? -1 : eegBuffer[2]);
+            eegPacket.setEeg4(Double.isNaN(eegBuffer[3]) ? -1 : eegBuffer[3]);
+            eegPacket.setAuxLeft(Double.isNaN(eegBuffer[4]) ? -1 : eegBuffer[4]);
+            eegPacket.setAuxRight(Double.isNaN(eegBuffer[5]) ? -1 : eegBuffer[5]);
             eegPacket.setTimeMills(System.currentTimeMillis());
 
             if(payload == null){
