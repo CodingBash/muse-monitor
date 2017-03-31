@@ -95,7 +95,7 @@ public class StreamingActivity extends Activity implements OnClickListener {
     /**
      * Tag used for logging purposes.
      */
-    private final String TAG = "TestLibMuseAndroid";
+    private final String TAG = "StreamingActivity";
 
     /**
      * The MuseManager is how you detect Muse headbands and receive notifications
@@ -149,7 +149,7 @@ public class StreamingActivity extends Activity implements OnClickListener {
     private final double[] accelBuffer = new double[3];
     private boolean accelStale;
     private final double[] gyroBuffer = new double[3];
-    private boolean gyroState;
+    private boolean gyroStale;
 
     /**
      * We will be updating the UI using a handler instead of in packet handlers because
@@ -190,7 +190,7 @@ public class StreamingActivity extends Activity implements OnClickListener {
     private static final String STOMP_URL = "wss://muse-monitor-socketserver.herokuapp.com"; // TODO: Stomp URL
     private static final String STOMP_SUBSCRIBE = "/muse-ws";
     private static final String STOMP_APP_SEND = "/app/muse-payload"; // TODO: Stomp Topic
-    private static final String STOMP_TOPIC_RECIEVE = "/topic/muse-payload"; // TODO: Stomp Topic
+    private static final String STOMP_TOPIC_RECIEVE = "/topic/muse-indicator"; // TODO: Stomp Topic
     //--------------------------------------
     // Lifecycle / Connection code
 
@@ -201,7 +201,6 @@ public class StreamingActivity extends Activity implements OnClickListener {
 
         gson = new GsonBuilder().serializeSpecialFloatingPointValues().create();
 
-        initStomp();
         // We need to set the context on MuseManagerAndroid before we can do anything.
         // This must come before other LibMuse API calls as it also loads the library.
         manager = MuseManagerAndroid.getInstance();
@@ -227,26 +226,26 @@ public class StreamingActivity extends Activity implements OnClickListener {
 
         // Load and initialize our UI.
         initUI();
+        initStomp();
 
         // Start up a thread for asynchronous file operations.
         // This is only needed if you want to do File I/O.
         fileThread.start();
 
         // Start our asynchronous updates of the UI.
-        handler.post(tickUi);
-        //handler.post(tickSocket);
+        handler.post(tickUiAndSocket);
     }
 
     protected void initStomp(){
-        mStompClient = Stomp.over(WebSocket.class, "wss://muse-monitor-socketserver.herokuapp.com/muse-ws");
+        mStompClient = Stomp.over(WebSocket.class, STOMP_URL + STOMP_SUBSCRIBE);
         mStompClient.connect();
-        mStompClient.topic("/topic/muse-indicator").subscribe(new Action1<StompMessage>() {
+        mStompClient.topic(STOMP_TOPIC_RECIEVE).subscribe(new Action1<StompMessage>() {
             @Override
             public void call(StompMessage stompMessage) {
-                Log.i("STOMP", stompMessage.getPayload());
+                Log.i(TAG, stompMessage.getPayload());
             }
         });
-        System.out.println("Stomp initiated");
+        Log.d(TAG, "STOMP connected");
     }
 
     protected void onPause() {
@@ -467,7 +466,7 @@ public class StreamingActivity extends Activity implements OnClickListener {
             case GYRO:
                 assert(gyroBuffer.length >= n);
                 getGyroValues(p);
-                gyroState = true;
+                gyroStale = true;
                 break;
             case BATTERY:
             case DRL_REF:
@@ -549,41 +548,36 @@ public class StreamingActivity extends Activity implements OnClickListener {
      * functions do some string allocation, so this reduces our memory
      * footprint and makes GC pauses less frequent/noticeable.
      */
-    private final Runnable tickUi = new Runnable() {
+    private final Runnable tickUiAndSocket = new Runnable() {
         @Override
         public void run() {
-            if (eegStale) {
-                updateEeg();
-            }
-            if (accelStale) {
-                updateAccel();
-            }
-            if (gyroState) {
-                updateGyro();
-            }
-            sendSocket();
-            handler.postDelayed(tickUi, 1000 / 60);
+            sendPacketToUi();
+            sendPacketToSocket();
+            handler.postDelayed(tickUiAndSocket, 1000 / 30);
         }
     };
 
+    private void sendPacketToUi(){
+        if (eegStale) {
+            updateEeg();
+        }
+        if (accelStale) {
+            updateAccel();
+        }
+        if (gyroStale) {
+            updateGyro();
+        }
+    }
     /*
         Send information to socket
      */
-    private final Runnable tickSocket = new Runnable() {
-        @Override
-        public void run() {
-            handler.postDelayed(tickSocket, 1000 / 60);
-        }
-    };
-
-    private void sendSocket(){
-        Log.i("STOMP", "Sending over");
-        if(muse == null || muse.getConnectionState() != ConnectionState.CONNECTED){
-            Log.i("STOMP", "MUSE DISCONNECTED");
+    private void sendPacketToSocket() {
+        if (muse == null || muse.getConnectionState() != ConnectionState.CONNECTED) {
+            Log.i(TAG, "MUSE DISCONNECTED");
             return;
         }
-        if(!mStompClient.isConnected()){
-            Log.i("STOMP", "STOMP NOT CONNECTED - CONNECTING");
+        if (!mStompClient.isConnected()) {
+            Log.i(TAG, "STOMP NOT CONNECTED - CONNECTING");
             initStomp();
             return;
         }
@@ -610,7 +604,7 @@ public class StreamingActivity extends Activity implements OnClickListener {
             eegPacket.setAuxRight(Double.isNaN(eegBuffer[5]) ? -1 : eegBuffer[5]);
             eegPacket.setTimeMills(System.currentTimeMillis());
 
-            if(payload == null){
+            if (payload == null) {
                 payload = new OutboundPayload();
             }
             payload.setEegData(Arrays.asList(eegPacket));
@@ -628,41 +622,41 @@ public class StreamingActivity extends Activity implements OnClickListener {
             accelerationPacket.setAccelZ(accelBuffer[2]);
             accelerationPacket.setTimeMillis(System.currentTimeMillis());
 
-            if(payload == null){
+            if (payload == null) {
                 payload = new OutboundPayload();
             }
             payload.setAccelerometerData(Arrays.asList(accelerationPacket));
             updated = true;
         }
-        if (gyroState) {
+        if (gyroStale) {
                 /* For Reference
                     gyroBuffer[0] = p.getGyroValue(Gyro.X);
                     gyroBuffer[1] = p.getGyroValue(Gyro.Y);
                     gyroBuffer[2] = p.getGyroValue(Gyro.Z);
                  */
-            gyroscopePacket =  new GyroscopePacket();
+            gyroscopePacket = new GyroscopePacket();
             gyroscopePacket.setGyroX(gyroBuffer[0]);
             gyroscopePacket.setGyroY(gyroBuffer[1]);
             gyroscopePacket.setGyroZ(gyroBuffer[2]);
             gyroscopePacket.setTimeMills(System.currentTimeMillis());
 
-            if(payload == null){
+            if (payload == null) {
                 payload = new OutboundPayload();
             }
             payload.setGyroscopeData(Arrays.asList(gyroscopePacket));
 
             updated = true;
         }
-        if(updated && payload != null) {
+        if (updated && payload != null) {
             payload.setFallFlag(false);
             payload.setSeizureFlag(false);
-            payload.setPatientId("000000"); // TODO: Hard coded
+            payload.setPatientId("123456"); // TODO: Hard coded
             payload.setTimeMills(System.currentTimeMillis());
-
-            mStompClient.send("/app/muse-payload", gson.toJson(payload)).subscribe();
-            Log.i("STOMP", "SENT: " + gson.toJson(payload));
+            mStompClient.send(STOMP_APP_SEND, gson.toJson(payload)).subscribe();
+            Log.v(TAG, "SENT: " + gson.toJson(payload));
         }
     }
+
     /**
      * The following methods update the TextViews in the UI with the data
      * from the buffers.
