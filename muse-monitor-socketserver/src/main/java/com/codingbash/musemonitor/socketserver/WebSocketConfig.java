@@ -29,6 +29,6 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 		 * This is the endpoint where clients register their WS client
 		 * Allowing any origin
 		 */
-		registry.addEndpoint("/muse-ws").setAllowedOrigins("*").withSockJS();
+		registry.addEndpoint("/muse-ws").setAllowedOrigins("*");
 	}
 }

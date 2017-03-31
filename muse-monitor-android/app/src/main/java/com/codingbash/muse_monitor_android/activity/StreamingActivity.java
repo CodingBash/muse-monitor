@@ -54,6 +54,7 @@ import com.codingbash.muse_monitor_android.model.EegPacket;
 import com.codingbash.muse_monitor_android.model.GyroscopePacket;
 import com.codingbash.muse_monitor_android.model.OutboundPayload;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import org.java_websocket.WebSocket;
 
@@ -63,8 +64,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import rx.functions.Action1;
 import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.client.StompClient;
+import ua.naiksoftware.stomp.client.StompMessage;
 
 /**
  * This example will illustrate how to connect to a Muse headband,
@@ -184,9 +187,10 @@ public class StreamingActivity extends Activity implements OnClickListener {
     private Gson gson;
 
     private StompClient mStompClient;
-    private static final String STOMP_URL = "wss://muse-monitor-socketserver.herokuapp.com/"; // TODO: Stomp URL
-    private static final String STOMP_TOPIC_RECEIVE = "/topic/muse-indicators"; // TODO: Stomp Topic
-    private static final String STOMP_TOPIC_SEND = "/topic/muse-payload"; // TODO: Stomp Topic
+    private static final String STOMP_URL = "wss://muse-monitor-socketserver.herokuapp.com"; // TODO: Stomp URL
+    private static final String STOMP_SUBSCRIBE = "/muse-ws";
+    private static final String STOMP_APP_SEND = "/app/muse-payload"; // TODO: Stomp Topic
+    private static final String STOMP_TOPIC_RECIEVE = "/topic/muse-payload"; // TODO: Stomp Topic
     //--------------------------------------
     // Lifecycle / Connection code
 
@@ -195,7 +199,7 @@ public class StreamingActivity extends Activity implements OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        gson = new Gson();
+        gson = new GsonBuilder().serializeSpecialFloatingPointValues().create();
 
         initStomp();
         // We need to set the context on MuseManagerAndroid before we can do anything.
@@ -230,12 +234,18 @@ public class StreamingActivity extends Activity implements OnClickListener {
 
         // Start our asynchronous updates of the UI.
         handler.post(tickUi);
-        handler.post(tickSocket);
+        //handler.post(tickSocket);
     }
 
     protected void initStomp(){
-        mStompClient = Stomp.over(WebSocket.class, STOMP_URL);
+        mStompClient = Stomp.over(WebSocket.class, "wss://muse-monitor-socketserver.herokuapp.com/muse-ws");
         mStompClient.connect();
+        mStompClient.topic("/topic/muse-indicator").subscribe(new Action1<StompMessage>() {
+            @Override
+            public void call(StompMessage stompMessage) {
+                Log.i("STOMP", stompMessage.getPayload());
+            }
+        });
         System.out.println("Stomp initiated");
     }
 
@@ -551,19 +561,38 @@ public class StreamingActivity extends Activity implements OnClickListener {
             if (gyroState) {
                 updateGyro();
             }
+            sendSocket();
             handler.postDelayed(tickUi, 1000 / 60);
         }
     };
 
+    /*
+        Send information to socket
+     */
     private final Runnable tickSocket = new Runnable() {
         @Override
         public void run() {
-            boolean updated = false;
-            OutboundPayload payload = null;
-            EegPacket eegPacket = null;
-            AccelerationPacket accelerationPacket = null;
-            GyroscopePacket gyroscopePacket = null;
-            if (eegStale) {
+            handler.postDelayed(tickSocket, 1000 / 60);
+        }
+    };
+
+    private void sendSocket(){
+        Log.i("STOMP", "Sending over");
+        if(muse == null || muse.getConnectionState() != ConnectionState.CONNECTED){
+            Log.i("STOMP", "MUSE DISCONNECTED");
+            return;
+        }
+        if(!mStompClient.isConnected()){
+            Log.i("STOMP", "STOMP NOT CONNECTED - CONNECTING");
+            initStomp();
+            return;
+        }
+        boolean updated = false;
+        OutboundPayload payload = null;
+        EegPacket eegPacket = null;
+        AccelerationPacket accelerationPacket = null;
+        GyroscopePacket gyroscopePacket = null;
+        if (eegStale) {
                 /* For Reference
                 buffer[0] = p.getEegChannelValue(Eeg.EEG1);
                 buffer[1] = p.getEegChannelValue(Eeg.EEG2);
@@ -572,71 +601,68 @@ public class StreamingActivity extends Activity implements OnClickListener {
                 buffer[4] = p.getEegChannelValue(Eeg.AUX_LEFT);
                 buffer[5] = p.getEegChannelValue(Eeg.AUX_RIGHT);
                 */
-                eegPacket = new EegPacket();
-                eegPacket.setEeg1(eegBuffer[0]);
-                eegPacket.setEeg2(eegBuffer[1]);
-                eegPacket.setEeg3(eegBuffer[2]);
-                eegPacket.setEeg4(eegBuffer[3]);
-                eegPacket.setAuxLeft(eegBuffer[4]);
-                eegPacket.setAuxRight(eegBuffer[5]);
-                eegPacket.setTimeMills(System.currentTimeMillis());
+            eegPacket = new EegPacket();
+            eegPacket.setEeg1(eegBuffer[0]);
+            eegPacket.setEeg2(eegBuffer[1]);
+            eegPacket.setEeg3(eegBuffer[2]);
+            eegPacket.setEeg4(eegBuffer[3]);
+            eegPacket.setAuxLeft(eegBuffer[4]);
+            eegPacket.setAuxRight(eegBuffer[5]);
+            eegPacket.setTimeMills(System.currentTimeMillis());
 
-                if(payload == null){
-                    payload = new OutboundPayload();
-                }
-                payload.setEegData(Arrays.asList(eegPacket));
-                updated = true;
+            if(payload == null){
+                payload = new OutboundPayload();
             }
-            if (accelStale) {
+            payload.setEegData(Arrays.asList(eegPacket));
+            updated = true;
+        }
+        if (accelStale) {
                 /* For Referemce
                     accelBuffer[0] = p.getAccelerometerValue(Accelerometer.X);
                     accelBuffer[1] = p.getAccelerometerValue(Accelerometer.Y);
                     accelBuffer[2] = p.getAccelerometerValue(Accelerometer.Z);
                  */
-                accelerationPacket = new AccelerationPacket();
-                accelerationPacket.setAccelX(accelBuffer[0]);
-                accelerationPacket.setAccelY(accelBuffer[1]);
-                accelerationPacket.setAccelZ(accelBuffer[2]);
-                accelerationPacket.setTimeMillis(System.currentTimeMillis());
+            accelerationPacket = new AccelerationPacket();
+            accelerationPacket.setAccelX(accelBuffer[0]);
+            accelerationPacket.setAccelY(accelBuffer[1]);
+            accelerationPacket.setAccelZ(accelBuffer[2]);
+            accelerationPacket.setTimeMillis(System.currentTimeMillis());
 
-                if(payload == null){
-                    payload = new OutboundPayload();
-                }
-                payload.setAccelerometerData(Arrays.asList(accelerationPacket));
-                updated = true;
+            if(payload == null){
+                payload = new OutboundPayload();
             }
-            if (gyroState) {
+            payload.setAccelerometerData(Arrays.asList(accelerationPacket));
+            updated = true;
+        }
+        if (gyroState) {
                 /* For Reference
                     gyroBuffer[0] = p.getGyroValue(Gyro.X);
                     gyroBuffer[1] = p.getGyroValue(Gyro.Y);
                     gyroBuffer[2] = p.getGyroValue(Gyro.Z);
                  */
-                gyroscopePacket =  new GyroscopePacket();
-                gyroscopePacket.setGyroX(gyroBuffer[0]);
-                gyroscopePacket.setGyroY(gyroBuffer[1]);
-                gyroscopePacket.setGyroZ(gyroBuffer[2]);
-                gyroscopePacket.setTimeMills(System.currentTimeMillis());
+            gyroscopePacket =  new GyroscopePacket();
+            gyroscopePacket.setGyroX(gyroBuffer[0]);
+            gyroscopePacket.setGyroY(gyroBuffer[1]);
+            gyroscopePacket.setGyroZ(gyroBuffer[2]);
+            gyroscopePacket.setTimeMills(System.currentTimeMillis());
 
-                if(payload == null){
-                    payload = new OutboundPayload();
-                }
-                payload.setGyroscopeData(Arrays.asList(gyroscopePacket));
+            if(payload == null){
+                payload = new OutboundPayload();
+            }
+            payload.setGyroscopeData(Arrays.asList(gyroscopePacket));
 
-                updated = true;
-            }
-            if(updated) {
-                payload.setFallFlag(false);
-                payload.setSeizureFlag(false);
-                payload.setPatientId("000000"); // TODO: Hard coded
-                payload.setTimeMills(System.currentTimeMillis());
-                mStompClient.send(STOMP_TOPIC_SEND, gson.toJson(accelerationPacket));
-                System.out.println(gson.toJson(accelerationPacket));
-                System.out.println(gson.toJson(gyroscopePacket));
-            }
-            handler.postDelayed(tickSocket, 1000 / 60);
+            updated = true;
         }
-    };
+        if(updated && payload != null) {
+            payload.setFallFlag(false);
+            payload.setSeizureFlag(false);
+            payload.setPatientId("000000"); // TODO: Hard coded
+            payload.setTimeMills(System.currentTimeMillis());
 
+            mStompClient.send("/app/muse-payload", gson.toJson(payload)).subscribe();
+            Log.i("STOMP", "SENT: " + gson.toJson(payload));
+        }
+    }
     /**
      * The following methods update the TextViews in the UI with the data
      * from the buffers.

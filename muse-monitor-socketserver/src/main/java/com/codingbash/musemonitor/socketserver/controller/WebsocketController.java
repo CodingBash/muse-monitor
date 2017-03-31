@@ -20,9 +20,9 @@ public class WebsocketController {
 	@MessageMapping("/muse-payload")
 	@SendTo("/topic/muse-indicator")
 	public OutboundPayload payload(InboundPayload inboundPayload) throws Exception {
-		Thread.sleep(1000);
 		Gson gson = new Gson();
 		logger.info(gson.toJson(inboundPayload));
+		System.out.println("RECIEVED");
 		OutboundPayload outboundPayload = new OutboundPayload();
 		outboundPayload.setPatientId("00000");
 		outboundPayload.setMentalStatus(MentalStatus.GOOD);
