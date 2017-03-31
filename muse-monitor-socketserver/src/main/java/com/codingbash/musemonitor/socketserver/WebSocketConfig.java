@@ -1,10 +1,18 @@
 package com.codingbash.musemonitor.socketserver;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+
+import com.codingbash.musemonitor.socketserver.model.InboundPayload;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -30,5 +38,15 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 		 * Allowing any origin
 		 */
 		registry.addEndpoint("/muse-ws").setAllowedOrigins("*");
+	}
+	
+	@Bean
+	public Gson gson(){
+		return new GsonBuilder().create();
+	}
+	
+	@Bean
+	public Queue<InboundPayload> dataQueue(){
+		return new LinkedList<InboundPayload>();
 	}
 }
