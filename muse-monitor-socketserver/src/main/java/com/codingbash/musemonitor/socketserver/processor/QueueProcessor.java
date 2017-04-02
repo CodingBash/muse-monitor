@@ -11,6 +11,9 @@ import com.codingbash.musemonitor.socketserver.model.InboundPayload;
 @Component
 public class QueueProcessor {
 
+	/*
+	 * May turn to be a Map<K,V> with V  as the Queue and K as the patient ID
+	 */
 	@Autowired
 	private Queue<InboundPayload> dataQueue;
 	

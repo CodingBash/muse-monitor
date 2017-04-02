@@ -1,7 +1,7 @@
 package com.codingbash.musemonitor.socketserver.model;
 
 public class GyroscopePacket {
-	private long timeMills;
+	private long timeMillis;
 
 	private double gyroX;
 	private double gyroY;
@@ -31,12 +31,12 @@ public class GyroscopePacket {
 		this.gyroZ = gyroZ;
 	}
 
-	public long getTimeMills() {
-		return timeMills;
+	public long getTimeMillis() {
+		return timeMillis;
 	}
 
-	public void setTimeMills(long timeMills) {
-		this.timeMills = timeMills;
+	public void setTimeMillis(long timeMillis) {
+		this.timeMillis = timeMillis;
 	}
 
 }

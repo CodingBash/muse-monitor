@@ -28,7 +28,7 @@ public class AccellerationProcessor {
 	 * TODO: Determine what derivative the algorithm uses
 	 * Calculates G/ms
 	 */
-	public List<AccelerationPacket> calculateJerk(List<AccelerationPacket> inboundPacket) {
+	public List<JerkPacket> calculateJerk(List<AccelerationPacket> inboundPacket) {
 		List<JerkPacket> outboundPacket = new LinkedList<JerkPacket>();
 		for (int i = 0; i < inboundPacket.size() - 1; i++) {
 			JerkPacket jPacket = new JerkPacket();
@@ -53,7 +53,8 @@ public class AccellerationProcessor {
 			 */
 			outboundPacket.add(jPacket);
 		}
-		return null;
+		
+		return outboundPacket;
 	}
 
 }
