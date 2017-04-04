@@ -20,7 +20,7 @@ import com.google.gson.Gson;
 @Controller
 public class WebsocketController {
 
-	private static Logger logger = LoggerFactory.getLogger(WebsocketController.class);
+	private final static Logger LOG = LoggerFactory.getLogger(WebsocketController.class);
 
 	@Autowired
 	private IndicatorWrapper indicators;
@@ -42,7 +42,8 @@ public class WebsocketController {
 	@MessageMapping("/muse-payload")
 	@SendTo("/topic/muse-indicator")
 	public OutboundPayload payload(InboundPayload inboundPayload) throws Exception {
-		logger.info(gson.toJson(inboundPayload));
+		LOG.info(gson.toJson(inboundPayload));
+
 		OutboundPayload outboundPayload = new OutboundPayload();
 		boolean fallFlag = false;
 		boolean seizureFlag = false;
@@ -51,6 +52,7 @@ public class WebsocketController {
 			if (indicators.getIndicatorTwo()) {
 				if (indicators.getIndicatorThree()) {
 					fallFlag = true;
+					LOG.info("FALL DETECTED PREVIOUSLY");
 				} else {
 					/*
 					 * Check indicatorThree
@@ -59,8 +61,10 @@ public class WebsocketController {
 					if (gyro > gyroUFT) {
 						indicators.setIndicatorThree(true);
 						fallFlag = true;
+						LOG.info("INDICATOR THREE TRUE");
+					} else {
+						LOG.info("INDICATOR THREE FALSE");
 					}
-
 				}
 			} else {
 				/*
@@ -69,10 +73,14 @@ public class WebsocketController {
 				double acc = accellerationProcessor.retrieveAcceleration(inboundPayload.getAccelerometerData().get(0));
 				if (acc > accelUFT) {
 					indicators.setIndicatorTwo(true);
+					LOG.info("INDICATOR TWO TRUE");
 					double gyro = gyroscopeProcessor.retrieveOrientation(inboundPayload.getGyroscopeData().get(0));
 					if (gyro > gyroUFT) {
 						indicators.setIndicatorThree(true);
+						LOG.info("INDICATOR THREE TRUE");
 						fallFlag = true;
+					} else {
+						LOG.info("INDICATOR THREE FALSE");
 					}
 				}
 
@@ -85,6 +93,9 @@ public class WebsocketController {
 			if (acc < accelLFT) {
 				indicators.setIndicatorOne(true);
 				indicators.setInitialTime(inboundPayload.getTimeMills());
+				LOG.info("INDICATOR ONE TRUE");
+			} else {
+				LOG.info("INDICATOR ONE FALSE");
 			}
 
 		}
@@ -104,6 +115,8 @@ public class WebsocketController {
 		} else {
 			outboundPayload.setMentalStatus(MentalStatus.GOOD);
 		}
+
+		LOG.info(gson.toJson(outboundPayload));
 		return outboundPayload;
 	}
 }
