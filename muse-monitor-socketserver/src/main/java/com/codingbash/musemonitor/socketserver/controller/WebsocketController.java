@@ -19,89 +19,91 @@ import com.google.gson.Gson;
 
 @Controller
 public class WebsocketController {
-	
+
 	private static Logger logger = LoggerFactory.getLogger(WebsocketController.class);
-	
+
 	@Autowired
 	private IndicatorWrapper indicators;
-	
+
 	@Autowired
 	private Gson gson;
-	
-	@Autowired
-	private QueueProcessor queueProcessor;
-	
+
 	@Autowired
 	private AccellerationProcessor accellerationProcessor;
-	
+
 	@Autowired
 	private GyroscopeProcessor gyroscopeProcessor;
-	
+
 	private static final double accelUFT = 0.0;
 	private static final double accelLFT = 0.0;
 	private static final double gyroUFT = 0.0;
-	
+
 	// TODO: Modularize into methods
 	@MessageMapping("/muse-payload")
 	@SendTo("/topic/muse-indicator")
 	public OutboundPayload payload(InboundPayload inboundPayload) throws Exception {
 		logger.info(gson.toJson(inboundPayload));
-	
+		OutboundPayload outboundPayload = new OutboundPayload();
+		boolean fallFlag = false;
+		boolean seizureFlag = false;
 		indicators.refresh(inboundPayload.getTimeMills());
-		if(indicators.getIndicatorOne()){
-			if(indicators.getIndicatorTwo()){
-				if(indicators.getIndicatorThree()){
-					// Output true
+		if (indicators.getIndicatorOne()) {
+			if (indicators.getIndicatorTwo()) {
+				if (indicators.getIndicatorThree()) {
+					fallFlag = true;
 				} else {
 					/*
 					 * Check indicatorThree
 					 */
 					double gyro = gyroscopeProcessor.retrieveOrientation(inboundPayload.getGyroscopeData().get(0));
-					if(gyro > gyroUFT){
+					if (gyro > gyroUFT) {
 						indicators.setIndicatorThree(true);
-						// Output true
+						fallFlag = true;
 					}
-					
+
 				}
 			} else {
 				/*
 				 * Check indicatorTwo AND three
 				 */
 				double acc = accellerationProcessor.retrieveAcceleration(inboundPayload.getAccelerometerData().get(0));
-				if( acc > accelUFT){
+				if (acc > accelUFT) {
 					indicators.setIndicatorTwo(true);
 					double gyro = gyroscopeProcessor.retrieveOrientation(inboundPayload.getGyroscopeData().get(0));
-					if(gyro > gyroUFT){
+					if (gyro > gyroUFT) {
 						indicators.setIndicatorThree(true);
-						// Output true
+						fallFlag = true;
 					}
 				}
-				
-				
+
 			}
 		} else {
 			/*
 			 * Check indicatorOne
 			 */
 			double acc = accellerationProcessor.retrieveAcceleration(inboundPayload.getAccelerometerData().get(0));
-			if(acc < accelLFT){
+			if (acc < accelLFT) {
 				indicators.setIndicatorOne(true);
 				indicators.setInitialTime(inboundPayload.getTimeMills());
 			}
-			
+
 		}
-		queueProcessor.addItem(inboundPayload);
-		
+
 		/*
-		 * TODO: Change from list to singleton
+		 * Set outbound properties
 		 */
-		accellerationProcessor.retrieveAcceleration(inboundPayload.getAccelerometerData().get(0));
-		gyroscopeProcessor.retrieveOrientation(inboundPayload.getGyroscopeData().get(0));
-		
-		OutboundPayload outboundPayload = new OutboundPayload();
 		outboundPayload.setPatientId(inboundPayload.getPatientId());
-		outboundPayload.setMentalStatus(MentalStatus.GOOD);
-		outboundPayload.setPhysicalStatus(PhysicalStatus.GOOD);
+		if (fallFlag) {
+			outboundPayload.setPhysicalStatus(PhysicalStatus.EMERGENCY);
+		} else {
+			outboundPayload.setPhysicalStatus(PhysicalStatus.GOOD);
+		}
+
+		if (seizureFlag) {
+			outboundPayload.setMentalStatus(MentalStatus.EMERGENCY);
+		} else {
+			outboundPayload.setMentalStatus(MentalStatus.GOOD);
+		}
 		return outboundPayload;
 	}
 }
