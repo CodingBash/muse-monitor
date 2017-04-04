@@ -11,6 +11,7 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 
 import com.codingbash.musemonitor.socketserver.model.InboundPayload;
+import com.codingbash.musemonitor.socketserver.model.IndicatorWrapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -48,5 +49,13 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 	@Bean
 	public Queue<InboundPayload> dataQueue(){
 		return new LinkedList<InboundPayload>();
+	}
+	
+	@Bean
+	public IndicatorWrapper indicatorWrapper(){
+		IndicatorWrapper indicators = new IndicatorWrapper();
+		indicators.setIndicatorOne(false);
+		indicators.setIndicatorTwo(false);
+		return indicators;
 	}
 }
