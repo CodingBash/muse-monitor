@@ -19,7 +19,7 @@ public class GyroscopeProcessor {
 				.sqrt(Math.pow(packet.getGyroX(), 2) + Math.pow(packet.getGyroY(), 2) + Math.pow(packet.getGyroZ(), 2));
 	}
 	
-	
+	@Deprecated
 	public List<AngularAccelerationPacket> calculateAngularAcceleration(List<GyroscopePacket> inboundPacket){
 		List<AngularAccelerationPacket> outboundPacket = new LinkedList<AngularAccelerationPacket>();
 		for (int i = 0; i < inboundPacket.size() - 1; i++) {

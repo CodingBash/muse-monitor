@@ -28,6 +28,7 @@ public class AccellerationProcessor {
 	 * TODO: Determine what derivative the algorithm uses
 	 * Calculates G/ms
 	 */
+	@Deprecated
 	public List<JerkPacket> calculateJerk(List<AccelerationPacket> inboundPacket) {
 		List<JerkPacket> outboundPacket = new LinkedList<JerkPacket>();
 		for (int i = 0; i < inboundPacket.size() - 1; i++) {
