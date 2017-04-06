@@ -38,6 +38,7 @@ public class WebsocketController {
 	private static final double accelLFT = 1.00;
 	private static final double gyroUFT = 220.0;
 
+	// TODO: Only send output out if a new status occurred! (find a way to conditionally send output in spring WS)
 	// TODO: Modularize into methods
 	@MessageMapping("/muse-payload")
 	@SendTo("/topic/muse-indicator")
