@@ -72,7 +72,7 @@ public class IndicatorWrapper {
 
 	public void refresh(long timeMillis) {
 		if (timeMillis - initialTime > timeInterval) {
-			this.initialTime = Long.MAX_VALUE; // Confirm default value
+			this.initialTime = timeMillis; // Confirm default value
 			indicatorOne = false;
 			indicatorTwo = false;
 		}

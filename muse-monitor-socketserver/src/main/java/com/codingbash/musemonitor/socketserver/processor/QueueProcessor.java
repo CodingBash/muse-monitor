@@ -8,13 +8,14 @@ import org.springframework.stereotype.Component;
 
 import com.codingbash.musemonitor.socketserver.model.InboundPayload;
 
-@Component
+@Deprecated
+//@Component
 public class QueueProcessor {
 
 	/*
 	 * May turn to be a Map<K,V> with V  as the Queue and K as the patient ID
 	 */
-	@Autowired
+	//@Autowired
 	private Queue<InboundPayload> dataQueue;
 	
 	private static final int MAX_QUEUE_DURATION = 3 * 1000;

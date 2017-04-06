@@ -56,6 +56,7 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 		IndicatorWrapper indicators = new IndicatorWrapper();
 		indicators.setIndicatorOne(false);
 		indicators.setIndicatorTwo(false);
+		indicators.setTimeInterval(1000);
 		return indicators;
 	}
 }

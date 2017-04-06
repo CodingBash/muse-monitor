@@ -35,7 +35,7 @@ public class WebsocketController {
 	private GyroscopeProcessor gyroscopeProcessor;
 
 	private static final double accelUFT = 1.60;
-	private static final double accelLFT = 0.90;
+	private static final double accelLFT = 1.00;
 	private static final double gyroUFT = 220.0;
 
 	// TODO: Modularize into methods
@@ -61,9 +61,9 @@ public class WebsocketController {
 					if (gyro > gyroUFT) {
 						indicators.setIndicatorThree(true);
 						fallFlag = true;
-						LOG.info("INDICATOR THREE TRUE");
+						LOG.info("INDICATOR THREE TRUE: " + gyro);
 					} else {
-						LOG.info("INDICATOR THREE FALSE");
+						LOG.info("INDICATOR THREE FALSE: " + gyro);
 					}
 				}
 			} else {
@@ -73,15 +73,18 @@ public class WebsocketController {
 				double acc = accellerationProcessor.retrieveAcceleration(inboundPayload.getAccelerometerData().get(0));
 				if (acc > accelUFT) {
 					indicators.setIndicatorTwo(true);
-					LOG.info("INDICATOR TWO TRUE");
+					indicators.setInitialTime(inboundPayload.getTimeMills());
+					LOG.info("INDICATOR TWO TRUE: " + acc);
 					double gyro = gyroscopeProcessor.retrieveOrientation(inboundPayload.getGyroscopeData().get(0));
 					if (gyro > gyroUFT) {
 						indicators.setIndicatorThree(true);
-						LOG.info("INDICATOR THREE TRUE");
+						LOG.info("INDICATOR THREE TRUE: " + gyro);
 						fallFlag = true;
 					} else {
-						LOG.info("INDICATOR THREE FALSE");
+						LOG.info("INDICATOR THREE FALSE: " + gyro);
 					}
+				} else {
+					LOG.info("INDICATOR TWO FALSE: " + acc);
 				}
 
 			}
@@ -93,9 +96,9 @@ public class WebsocketController {
 			if (acc < accelLFT) {
 				indicators.setIndicatorOne(true);
 				indicators.setInitialTime(inboundPayload.getTimeMills());
-				LOG.info("INDICATOR ONE TRUE");
+				LOG.info("INDICATOR ONE TRUE: " + acc);
 			} else {
-				LOG.info("INDICATOR ONE FALSE");
+				LOG.info("INDICATOR ONE FALSE: " + acc);
 			}
 
 		}
