@@ -34,9 +34,9 @@ public class WebsocketController {
 	@Autowired
 	private GyroscopeProcessor gyroscopeProcessor;
 
-	private static final double accelUFT = 0.0;
-	private static final double accelLFT = 0.0;
-	private static final double gyroUFT = 0.0;
+	private static final double accelUFT = 1.60;
+	private static final double accelLFT = 0.90;
+	private static final double gyroUFT = 220.0;
 
 	// TODO: Modularize into methods
 	@MessageMapping("/muse-payload")
