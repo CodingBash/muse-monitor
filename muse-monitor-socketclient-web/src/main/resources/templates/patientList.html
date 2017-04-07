@@ -25,12 +25,16 @@
 	<![endif]-->
 </head>
 <body>
+	<h1>STATUS: </h1>
+	<p id="status"></p>
 
 
 
 
 
-
+	<script src="https://code.jquery.com/jquery-3.2.1.min.js"
+		integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+		crossorigin="anonymous"></script>
 	<script type="text/javascript"
 		th:src="@{node_modules/webstomp-client/dist/webstomp.min.js}"></script>
 	<script type="text/javascript">
@@ -52,9 +56,11 @@
 			encode : jsonEncoder.encode,
 			decode : jsonEncoder.decode
 		}
-
+		clients.a.heartbeat.outgoing = 20000; // client will send heartbeats every 20000ms
+		clients.a.heartbeat.incoming = 0;
 		clients.a.connect({}, function(evt) {
 		});
+
 		var delayMillis = 2000; //1 second
 		var subscriptions = {};
 		setTimeout(function() {
@@ -64,6 +70,17 @@
 							if (message.body) {
 								body = jsonEncoder.decode(message.body);
 								console.log(body);
+								switch (body.physicalStatus) {
+								case "GOOD":
+									$("#status").text("GOOD");
+									break;
+								case "EMERGENCY":
+									$("#status").text("EMERGENCY");
+									break;
+								default:
+									console.log("Uncaught status: "
+											+ body.physicalStatus);
+								}
 							}
 						})
 			};
