@@ -1,0 +1,74 @@
+body {
+	background-color: #eee;
+}
+.panel {
+	border: 1px solid #222222;
+	transition: box-shadow 0.5s;
+	max-width: 95%;
+	margin-top: 30px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-left: auto;
+}
+
+.panel:hover {
+	box-shadow: 5px 0px 40px rgba(0, 0, 0, .2);
+}
+
+.panel-footer .btn:hover {
+	border: 1px solid #f4511e;
+	background-color: #fff !important;
+	color: #f4511e;
+}
+
+.panel-heading {
+	color: #fff !important;
+	background-color: #222222 !important;
+	padding: 25px;
+	border-bottom: 1px solid transparent;
+	background-color: #222222 !important;
+	transition: background-color 0.5s;
+}
+
+.panel-heading:hover {
+	background-color: #444 !important;
+	cursor: pointer;
+}
+
+.panel-footer {
+	background-color: #fff !important;
+}
+
+.panel-footer h3 {
+	font-size: 32px;
+}
+
+.panel-footer h4 {
+	color: #aaa;
+	font-size: 14px;
+}
+
+.panel-footer .btn {
+	margin: 15px 0;
+	background-color: #f4511e;
+	color: #fff;
+}
+
+.profile-img {
+	border-radius: 50%;
+	width: 50%;
+}
+
+.muse-indicator {
+	font-size: 5.2em;
+}
+
+.glyphicon-ok-circle {
+	color: #00ff00;
+	-webkit-font-smoothing: antialiased;
+}
+
+.glyphicon-remove-circle {
+	color: #ff0000;
+	-webkit-font-smoothing: antialiased;
+}
