@@ -6,10 +6,10 @@
 <html class="no-js" xmlns:th="http://www.thymeleaf.org">
 <!--<![endif]-->
 <head>
-<meta charset="utf-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <title>Patient Information - <!-- TODO: Put patient name --></title>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="author" content="Basheer Becerra" />
 
 <!-- Google Fonts -->
@@ -25,5 +25,49 @@
 	<![endif]-->
 </head>
 <body>
+
+
+
+
+
+
+	<script type="text/javascript"
+		th:src="@{node_modules/webstomp-client/dist/webstomp.min.js}"></script>
+	<script type="text/javascript">
+		// TODO: Heartbeat implementation
+		var url = "wss://muse-monitor-socketserver.herokuapp.com/muse-ws";
+		var clients = {
+			a : webstomp.client(url)
+		}
+
+		var jsonEncoder = {
+			encode : function(msg) {
+				return JSON.stringify(msg);
+			},
+			decode : function(msg) {
+				return JSON.parse(msg);
+			}
+		};
+		var encoder = {
+			encode : jsonEncoder.encode,
+			decode : jsonEncoder.decode
+		}
+
+		clients.a.connect({}, function(evt) {
+		});
+		var delayMillis = 2000; //1 second
+		var subscriptions = {};
+		setTimeout(function() {
+			subscriptions = {
+				indicator : clients.a.subscribe("/topic/muse-indicator",
+						function(message) {
+							if (message.body) {
+								body = jsonEncoder.decode(message.body);
+								console.log(body);
+							}
+						})
+			};
+		}, delayMillis);
+	</script>
 </body>
 </html>
