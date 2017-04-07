@@ -45,6 +45,9 @@ public class WebsocketController {
 	private static final double accelLFT = 1.00;
 	private static final double gyroUFT = 220.0;
 
+	private static final String TOPIC_VERBOSE ="/topic/muse-verbose";
+	private static final String TOPIC_INDICATOR = "/topic/muse-indicator";
+	
 	// TODO: Only send output out if a new status occurred! (find a way to conditionally send output in spring WS)
 	// TODO: Modularize into methods
 	@MessageMapping("/muse-payload")
@@ -149,7 +152,7 @@ public class WebsocketController {
 		
 		if(newStatus){
 			LOG.info("SENDING INDICATOR PAYLOAD: " + gson.toJson(outboundIndicatorPayload));
-			template.convertAndSend("/topic/muse-indicator", outboundIndicatorPayload);
+			template.convertAndSend(TOPIC_INDICATOR, outboundIndicatorPayload);
 		}
 
 		/*
@@ -164,6 +167,6 @@ public class WebsocketController {
 		outboundVerbosePayload.setMentalStatus(outboundIndicatorPayload.getMentalStatus());
 		outboundVerbosePayload.setPhysicalStatus(outboundIndicatorPayload.getPhysicalStatus());
 		
-		template.convertAndSend("/topic/muse-verbose", outboundVerbosePayload);
+		template.convertAndSend(TOPIC_VERBOSE, outboundVerbosePayload);
 	}
 }

@@ -5,24 +5,46 @@
     <title>title</title>
   </head>
   <body>
+    <script type="text/javascript" src="node_modules/webstomp-client/dist/webstomp.min.js"></script>
+    <script type="text/javascript">
+      // TODO: Heartbeat implementation
+      function WebSocketTest(){
+        var url = "wss://muse-monitor-socketserver.herokuapp.com/muse-ws";
+        var clients = {
+          a: webstomp.client(url)
+        }
 
-  <script src="https://cdn.jsdelivr.net/sockjs/1/sockjs.min.js"></script>
-  <script>
-    var sock = new SockJS('https://muse-monitor-socketserver.herokuapp.com/muse-ws');
-    sock.onopen = function() {
-        console.log('OPEN');
-    };
-    sock.onmessage = function(e) {
-        console.log('RECIEVED', e.data);
-    };
-    sock.onclose = function() {
-        console.log('CLOSED');
-    };
-    sock.send('test');
-    sock.send('test');
-    sock.send('test');
-    sock.close();
+        var jsonEncoder = {
+            encode: function(msg) {
+                return JSON.stringify(msg);
+            },
+            decode: function(msg) {
+                return JSON.parse(msg);
+            }
+        };
+        var encoder = {encode: jsonEncoder.encode, decode: jsonEncoder.decode}
 
-  </script>
+        clients.a.connect({}, function(evt){});
+        var delayMillis = 1000; //1 second
+        var subscriptions = {};
+        setTimeout(function() {
+          subscriptions = {
+            indicator: clients.a.subscribe("/topic/muse-indicator", function(message){
+              if(message.body){
+                console.log(message.body);
+              }
+            }),
+            verbose: clients.a.subscribe("/topic/muse-verbose", function(message){
+              if(message.body){
+                console.log(message.body);
+              }
+            })
+          };
+        }, delayMillis);
+      }
+    </script>
+    <div id="sse">
+       <a href="javascript:WebSocketTest()">Run WebSocket</a>
+    </div>
   </body>
 </html>
