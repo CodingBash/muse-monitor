@@ -12,6 +12,7 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 
 import com.codingbash.musemonitor.socketserver.model.InboundPayload;
 import com.codingbash.musemonitor.socketserver.model.IndicatorWrapper;
+import com.codingbash.musemonitor.socketserver.model.PreviousStatusHolder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -59,4 +60,12 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 		indicators.setTimeInterval(1000);
 		return indicators;
 	}
+	
+	@Bean
+	public PreviousStatusHolder previousStatus(){
+		PreviousStatusHolder previousStatus = new PreviousStatusHolder();
+		return previousStatus;
+	}
+	
+	
 }

@@ -1,6 +1,6 @@
 package com.codingbash.musemonitor.socketserver.model;
 
-public class OutboundPayload {
+public class OutboundIndicatorPayload {
 	private String patientId;
 	private MentalStatus mentalStatus;
 	private PhysicalStatus physicalStatus;

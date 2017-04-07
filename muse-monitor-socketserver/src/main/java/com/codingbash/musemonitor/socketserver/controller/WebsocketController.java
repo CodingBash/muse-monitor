@@ -4,17 +4,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import com.codingbash.musemonitor.socketserver.model.InboundPayload;
 import com.codingbash.musemonitor.socketserver.model.IndicatorWrapper;
 import com.codingbash.musemonitor.socketserver.model.MentalStatus;
-import com.codingbash.musemonitor.socketserver.model.OutboundPayload;
+import com.codingbash.musemonitor.socketserver.model.OutboundIndicatorPayload;
+import com.codingbash.musemonitor.socketserver.model.OutboundVerbosePayload;
 import com.codingbash.musemonitor.socketserver.model.PhysicalStatus;
+import com.codingbash.musemonitor.socketserver.model.PreviousStatusHolder;
 import com.codingbash.musemonitor.socketserver.processor.AccellerationProcessor;
 import com.codingbash.musemonitor.socketserver.processor.GyroscopeProcessor;
-import com.codingbash.musemonitor.socketserver.processor.QueueProcessor;
 import com.google.gson.Gson;
 
 @Controller
@@ -34,6 +35,12 @@ public class WebsocketController {
 	@Autowired
 	private GyroscopeProcessor gyroscopeProcessor;
 
+	@Autowired
+	private SimpMessagingTemplate template;
+	
+	@Autowired
+	private PreviousStatusHolder previousStatus;
+	
 	private static final double accelUFT = 1.60;
 	private static final double accelLFT = 1.00;
 	private static final double gyroUFT = 220.0;
@@ -41,13 +48,11 @@ public class WebsocketController {
 	// TODO: Only send output out if a new status occurred! (find a way to conditionally send output in spring WS)
 	// TODO: Modularize into methods
 	@MessageMapping("/muse-payload")
-	@SendTo("/topic/muse-indicator")
-	public OutboundPayload payload(InboundPayload inboundPayload) throws Exception {
+	public void payload(InboundPayload inboundPayload) throws Exception {
 		LOG.info(gson.toJson(inboundPayload));
 
-		OutboundPayload outboundPayload = new OutboundPayload();
-		boolean fallFlag = false;
-		boolean seizureFlag = false;
+		boolean fallFlag = inboundPayload.getFallFlag();
+		boolean seizureFlag = inboundPayload.getSeizureFlag();
 		indicators.refresh(inboundPayload.getTimeMills());
 		if (indicators.getIndicatorOne()) {
 			if (indicators.getIndicatorTwo()) {
@@ -105,22 +110,60 @@ public class WebsocketController {
 		}
 
 		/*
-		 * Set outbound properties
+		 * Set indicator outbound properties
 		 */
-		outboundPayload.setPatientId(inboundPayload.getPatientId());
+		OutboundIndicatorPayload outboundIndicatorPayload = new OutboundIndicatorPayload();
+		outboundIndicatorPayload.setPatientId(inboundPayload.getPatientId());
+		boolean newStatus = false;
 		if (fallFlag) {
-			outboundPayload.setPhysicalStatus(PhysicalStatus.EMERGENCY);
+			outboundIndicatorPayload.setPhysicalStatus(PhysicalStatus.EMERGENCY);
+			if(previousStatus.getPhysicalStatus() != PhysicalStatus.EMERGENCY){
+				// New status
+				newStatus = true;
+				previousStatus.setPhysicalStatus(PhysicalStatus.EMERGENCY);
+			}
 		} else {
-			outboundPayload.setPhysicalStatus(PhysicalStatus.GOOD);
+			outboundIndicatorPayload.setPhysicalStatus(PhysicalStatus.GOOD);
+			if(previousStatus.getPhysicalStatus() != PhysicalStatus.GOOD){
+				// New status
+				newStatus = true;
+				previousStatus.setPhysicalStatus(PhysicalStatus.GOOD);
+			}
 		}
-
+		
 		if (seizureFlag) {
-			outboundPayload.setMentalStatus(MentalStatus.EMERGENCY);
+			outboundIndicatorPayload.setMentalStatus(MentalStatus.EMERGENCY);
+			if(previousStatus.getMentalStatus() != MentalStatus.EMERGENCY){
+				// New status
+				newStatus = true;
+				previousStatus.setMentalStatus(MentalStatus.EMERGENCY);
+			}
 		} else {
-			outboundPayload.setMentalStatus(MentalStatus.GOOD);
+			outboundIndicatorPayload.setMentalStatus(MentalStatus.GOOD);
+			if(previousStatus.getMentalStatus() != MentalStatus.GOOD){
+				// New status
+				newStatus = true;
+				previousStatus.setMentalStatus(MentalStatus.GOOD);
+			}
+		}
+		
+		if(newStatus){
+			LOG.info("SENDING INDICATOR PAYLOAD: " + gson.toJson(outboundIndicatorPayload));
+			template.convertAndSend("/topic/muse-indicator", outboundIndicatorPayload);
 		}
 
-		LOG.info(gson.toJson(outboundPayload));
-		return outboundPayload;
+		/*
+		 * Set verbose outbound properties
+		 */
+		OutboundVerbosePayload outboundVerbosePayload = new OutboundVerbosePayload();
+		outboundVerbosePayload.setPatientId(inboundPayload.getPatientId());
+		outboundVerbosePayload.setTimeMillis(inboundPayload.getTimeMills());
+		outboundVerbosePayload.setEegData(inboundPayload.getEegData());
+		outboundVerbosePayload.setAccelerometerData(inboundPayload.getAccelerometerData());
+		outboundVerbosePayload.setGyroscopeData(inboundPayload.getGyroscopeData());
+		outboundVerbosePayload.setMentalStatus(outboundIndicatorPayload.getMentalStatus());
+		outboundVerbosePayload.setPhysicalStatus(outboundIndicatorPayload.getPhysicalStatus());
+		
+		template.convertAndSend("/topic/muse-verbose", outboundVerbosePayload);
 	}
 }

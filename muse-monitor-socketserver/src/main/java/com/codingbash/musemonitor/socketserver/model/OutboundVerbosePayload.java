@@ -2,14 +2,14 @@ package com.codingbash.musemonitor.socketserver.model;
 
 import java.util.List;
 
-public class InboundPayload {
+public class OutboundVerbosePayload {
 	private String patientId;
 	private long timeMillis;
 	private List<EegPacket> eegData;
 	private List<AccelerationPacket> accelerometerData;
 	private List<GyroscopePacket> gyroscopeData;
-	private Boolean seizureFlag;
-	private Boolean fallFlag;
+	private MentalStatus mentalStatus;
+	private PhysicalStatus physicalStatus;
 
 	public String getPatientId() {
 		return patientId;
@@ -19,13 +19,12 @@ public class InboundPayload {
 		this.patientId = patientId;
 	}
 
-	// TODO: Rename to Millis
-	public long getTimeMills() {
+	public long getTimeMillis() {
 		return timeMillis;
 	}
 
-	public void setTimeMills(long timeMills) {
-		this.timeMillis = timeMills;
+	public void setTimeMillis(long timeMillis) {
+		this.timeMillis = timeMillis;
 	}
 
 	public List<EegPacket> getEegData() {
@@ -52,20 +51,20 @@ public class InboundPayload {
 		this.gyroscopeData = gyroscopeData;
 	}
 
-	public Boolean getSeizureFlag() {
-		return seizureFlag;
+	public MentalStatus getMentalStatus() {
+		return mentalStatus;
 	}
 
-	public void setSeizureFlag(Boolean seizureFlag) {
-		this.seizureFlag = seizureFlag;
+	public void setMentalStatus(MentalStatus mentalStatus) {
+		this.mentalStatus = mentalStatus;
 	}
 
-	public Boolean getFallFlag() {
-		return fallFlag;
+	public PhysicalStatus getPhysicalStatus() {
+		return physicalStatus;
 	}
 
-	public void setFallFlag(Boolean fallFlag) {
-		this.fallFlag = fallFlag;
+	public void setPhysicalStatus(PhysicalStatus physicalStatus) {
+		this.physicalStatus = physicalStatus;
 	}
 
 }
