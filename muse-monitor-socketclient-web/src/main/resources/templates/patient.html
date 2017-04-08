@@ -53,9 +53,92 @@ path {
 	stroke-width: 1;
 	shape-rendering: crispEdges;
 }
+
+div[id*="graph"] {
+	width: 80%;
+	margin: auto;
+}
 </style>
 <body>
 
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-sm-3 col-lg-2">
+				<nav class="navbar navbar-inverse navbar-fixed-side">
+					<div class="container">
+						<div class="navbar-header">
+							<button class="navbar-toggle" data-target=".navbar-collapse"
+								data-toggle="collapse">
+								<span class="sr-only">Toggle navigation</span> <span
+									class="icon-bar"></span> <span class="icon-bar"></span> <span
+									class="icon-bar"></span>
+							</button>
+							<a class="navbar-brand" href="./">Basheer Becerra</a>
+						</div>
+						<div class="collapse navbar-collapse">
+							<ul class="nav navbar-nav">
+								<li class="dropdown"><a class="dropdown-toggle"
+									data-toggle="dropdown" href="#">Patients <b class="caret"></b></a>
+									<ul class="dropdown-menu">
+										<li><a href="#">Basheer Becerra</a></li>
+									</ul></li>
+							</ul>
+							<p class="navbar-text">
+								Muse Monitor by <a href="http://www.basheerbecerra.com">Basheer
+									Becerra</a>
+							</p>
+						</div>
+					</div>
+				</nav>
+			</div>
+			<div class="col-sm-9 col-lg-10">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<div class="row">
+							<div class="col-sm-3 text-center">
+								<img src="../static/img/profile.png"
+									th:src="@{/img/profile.png}" class="profile-img" />
+							</div>
+							<div class="col-sm-5">
+								<h1>Basheer Becerra</h1>
+								<p style="font-size: 1.2em;">Room A104</p>
+							</div>
+							<div class="col-sm-4 text-center">
+								<div class="row">
+									<div class="col-sm-6">Mental Status</div>
+									<div class="col-sm-6">Physical Status</div>
+								</div>
+								<div class="row" style="padding-top: 10px;">
+									<div class="col-sm-6">
+										<span class="glyphicon glyphicon-ok-circle muse-indicator"
+											id="mental-indicator" aria-hidden="true"></span>
+									</div>
+									<div class="col-sm-6">
+										<span class="glyphicon glyphicon-ok-circle muse-indicator"
+											id="physical-indicator" aria-hidden="true"></span>
+									</div>
+								</div>
+
+							</div>
+						</div>
+					</div>
+					<div class="panel-body">
+						<div class="row">
+							<div id="accel-mag-graph"></div>
+						</div>
+						<div class="row">
+							<div id="gyro-mag-graph"></div>
+						</div>
+					</div>
+					<div class="panel-footer">Panel footer</div>
+				</div>
+				<div class="row"></div>
+
+
+			</div>
+
+		</div>
+	</div>
 	<script src="https://code.jquery.com/jquery-3.2.1.min.js"
 		integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
 		crossorigin="anonymous"></script>
@@ -66,10 +149,6 @@ path {
 		integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
 		crossorigin="anonymous"></script>
 
-
-
-	<div id="accel-mag-graph"></div>
-	<div id="gyro-mag-graph"></div>
 	<!-- load the d3.js library -->
 	<script src="http://d3js.org/d3.v3.min.js"></script>
 	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
@@ -77,11 +156,11 @@ path {
 		src="../static/node_modules/webstomp-client/dist/webstomp.min.js"
 		th:src="@{/node_modules/webstomp-client/dist/webstomp.min.js}"></script>
 	<script>
-		var accel_mag_data =  [ {
+		var accel_mag_data = [ {
 			y : [],
 			mode : 'lines',
 			marker : {
-				color : 'pink',
+				color : 'red',
 				size : 8
 			},
 			line : {
@@ -89,15 +168,21 @@ path {
 			}
 		} ];
 		Plotly.plot('accel-mag-graph', accel_mag_data, {
-			xaxis: {range: [0, 50]},
-			yaxis: {range: [0.75, 1.5]}
+			title : "Acceleration Magnitude",
+			xaxis : {
+				range : [ 0, 50 ]
+			},
+			yaxis : {
+				title : "Value",
+				range : [ 0.75, 1.5 ]
+			}
 		});
-		
-		var gyro_mag_data =  [ {
+
+		var gyro_mag_data = [ {
 			y : [],
 			mode : 'lines',
 			marker : {
-				color : 'pink',
+				color : 'blue',
 				size : 8
 			},
 			line : {
@@ -105,8 +190,14 @@ path {
 			}
 		} ];
 		Plotly.plot('gyro-mag-graph', gyro_mag_data, {
-			xaxis: {range: [0, 50]},
-			yaxis: {range: [0, 200]}
+			title : 'Gyroscope Magnitude',
+			xaxis : {
+				range : [ 0, 50 ]
+			},
+			yaxis : {
+				title : "Value",
+				range : [ 0, 200 ]
+			}
 		});
 	</script>
 	<script type="text/javascript">
@@ -136,36 +227,134 @@ path {
 		var delayMillis = 2000; //1 second
 		var subscriptions = {};
 		var cnt = 0;
-		setTimeout(function() {
-			subscriptions = { 
-				indicator : clients.a.subscribe("/topic/muse-verbose",
-						function(message) {
-							if (message.body) {
-								body = jsonEncoder.decode(message.body);
-								// TODO: Temporarily choose the accelX for testing
-								accel_point = body.accelerometerData[0];
-								gyro_point = body.gyroscopeData[0];
-								//console.log(body); 
-								if (cnt % 7 == 0) {
-									var x_range = 25;
-									Plotly.extendTraces('accel-mag-graph', {
-										y : [ [ Math.sqrt(Math.pow(accel_point .accelX, 2) + Math.pow(accel_point .accelY, 2) + Math.pow(accel_point .accelZ, 2)) ]]
-									}, [ 0]);
-									accel_mag_data[0].y = accel_mag_data[0].y.slice(Math.max(accel_mag_data[0].y.length - x_range , 0));
-									Plotly.relayout("accel-mag-graph", {xaxis: {range: [accel_mag_data[0].y.length - x_range , accel_mag_data[0].y.length]}});
-									
-									Plotly.extendTraces('gyro-mag-graph', {
-										y : [ [ Math.sqrt(Math.pow(gyro_point.gyroX, 2) + Math.pow(gyro_point.gyroY, 2) + Math.pow(gyro_point.gyroZ, 2)) ]]
-									}, [0]);
-									gyro_mag_data[0].y = gyro_mag_data[0].y.slice(Math.max(gyro_mag_data[0].y.length - x_range , 0));
-									Plotly.relayout("gyro-mag-graph", {xaxis: {range: [gyro_mag_data[0].y.length - x_range , gyro_mag_data[0].y.length]}});
-									
-								}
-								cnt++;
-							}
-						})
-			};
-		}, delayMillis);
+		setTimeout(
+				function() {
+					subscriptions = {
+						indicator : clients.a
+								.subscribe(
+										"/topic/muse-verbose",
+										function(message) {
+											if (message.body) {
+												body = jsonEncoder
+														.decode(message.body);
+												// TODO: Temporarily choose the accelX for testing
+												accel_point = body.accelerometerData[0];
+												gyro_point = body.gyroscopeData[0];
+												//console.log(body); 
+												if (cnt % 7 == 0) {
+													var x_range = 25;
+													Plotly
+															.extendTraces(
+																	'accel-mag-graph',
+																	{
+																		y : [ [ Math
+																				.sqrt(Math
+																						.pow(
+																								accel_point.accelX,
+																								2)
+																						+ Math
+																								.pow(
+																										accel_point.accelY,
+																										2)
+																						+ Math
+																								.pow(
+																										accel_point.accelZ,
+																										2)) ] ]
+																	}, [ 0 ]);
+													accel_mag_data[0].y = accel_mag_data[0].y
+															.slice(Math
+																	.max(
+																			accel_mag_data[0].y.length
+																					- x_range,
+																			0));
+													Plotly
+															.relayout(
+																	"accel-mag-graph",
+																	{
+																		xaxis : {
+																			range : [
+																					accel_mag_data[0].y.length
+																							- x_range,
+																					accel_mag_data[0].y.length ]
+																		}
+																	});
+
+													Plotly
+															.extendTraces(
+																	'gyro-mag-graph',
+																	{
+																		y : [ [ Math
+																				.sqrt(Math
+																						.pow(
+																								gyro_point.gyroX,
+																								2)
+																						+ Math
+																								.pow(
+																										gyro_point.gyroY,
+																										2)
+																						+ Math
+																								.pow(
+																										gyro_point.gyroZ,
+																										2)) ] ]
+																	}, [ 0 ]);
+													gyro_mag_data[0].y = gyro_mag_data[0].y
+															.slice(Math
+																	.max(
+																			gyro_mag_data[0].y.length
+																					- x_range,
+																			0));
+													Plotly
+															.relayout(
+																	"gyro-mag-graph",
+																	{
+																		xaxis : {
+																			range : [
+																					gyro_mag_data[0].y.length
+																							- x_range,
+																					gyro_mag_data[0].y.length ]
+																		}
+																	});
+
+												}
+												cnt++;
+											}
+										}),
+						indicator : clients.a
+								.subscribe(
+										"/topic/muse-indicator",
+										function(message) {
+											if (message.body) {
+												body = jsonEncoder
+														.decode(message.body);
+												console.log(body);
+												switch (body.physicalStatus) {
+												case "GOOD":
+													$("#physical-indicator")
+															.removeClass(
+																	"glyphicon-remove-circle");
+													$("#physical-indicator")
+															.addClass(
+																	"glyphicon-ok-circle");
+													console.log("GOOD");
+													break;
+												case "EMERGENCY":
+													$("#physical-indicator")
+															.removeClass(
+																	"glyphicon-ok-circle");
+													$("#physical-indicator")
+															.addClass(
+																	"glyphicon-remove-circle");
+													console.log("EMERGENCY");
+													break;
+												default:
+													console
+															.log("Uncaught status: "
+																	+ body.physicalStatus);
+												}
+											}
+										})
+					};
+				}, delayMillis);
 	</script>
 </body>
 </html>
