@@ -182,22 +182,24 @@ path {
 								accel_point = body.accelerometerData[0];
 								gyro_point = body.gyroscopeData[0];
 								//console.log(body); 
-								if (cnt % 10 == 0) {
+								if (cnt % 7 == 0) {
 									//Plotly.extendTraces('accel-graph', {
 										//y : [ [ accel_point .accelX ],
 											//	[ accel_point .accelY ], [accel_point .accelZ] ]
 									//}, [ 0, 1, 2 ]);
 									//Plotly.relayout("accel-graph", {xaxis: {range: [accel_data[0].y.length - 50, accel_data[0].y.length]}});
-									
+									var x_range = 25;
 									Plotly.extendTraces('accel-mag-graph', {
 										y : [ [ Math.sqrt(Math.pow(accel_point .accelX, 2) + Math.pow(accel_point .accelY, 2) + Math.pow(accel_point .accelZ, 2)) ]]
 									}, [ 0]);
-									Plotly.relayout("accel-mag-graph", {xaxis: {range: [accel_mag_data[0].y.length - 50, accel_mag_data[0].y.length]}});
+									accel_mag_data[0].y = accel_mag_data[0].y.slice(Math.max(accel_mag_data[0].y.length - x_range , 0));
+									Plotly.relayout("accel-mag-graph", {xaxis: {range: [accel_mag_data[0].y.length - x_range , accel_mag_data[0].y.length]}});
 									
 									Plotly.extendTraces('gyro-mag-graph', {
 										y : [ [ Math.sqrt(Math.pow(gyro_point.gyroX, 2) + Math.pow(gyro_point.gyroY, 2) + Math.pow(gyro_point.gyroZ, 2)) ]]
 									}, [0]);
-									Plotly.relayout("gyro-mag-graph", {xaxis: {range: [gyro_mag_data[0].y.length - 50, gyro_mag_data[0].y.length]}});
+									gyro_mag_data[0].y = gyro_mag_data[0].y.slice(Math.max(gyro_mag_data[0].y.length - x_range , 0));
+									Plotly.relayout("gyro-mag-graph", {xaxis: {range: [gyro_mag_data[0].y.length - x_range , gyro_mag_data[0].y.length]}});
 									
 								}
 								cnt++;
