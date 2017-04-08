@@ -12,6 +12,15 @@
  * the License.
  */
 
+var accelData = {
+	"start" : new Date().getTime(),	
+	"step" : 100,
+	"end" : new Date().getTime() + 60000,
+	"names" : [ "Magnitude" ],
+	"values" : [[]],
+	"times" : [[]]
+}; 
+
 /*
  * sample data to plot over time
  */
@@ -991,9 +1000,8 @@ var data = {
 var dataA = {
 	"start" : 1336681080000,
 	"end" : 1336681080000,
-	"step" : 120000,
-	"names" : [ "Stats_count2xx", "Stats_count3xx", "Stats_count4xx",
-			"Stats_count5xx" ],
+	"step" : 100,
+	"names" : [ "magnitude" ],
 	"values" : [ [ 15625.6826207297 ], [ 411.161376855185 ],
 			[ 22.3887353437241 ], [ 22.3334186252455 ] ]
 };

@@ -60,8 +60,8 @@ function LineGraph(argsMap) {
 	this.slideData = function(newData) {
 		// validate data
 		var tempData = processDataMap(newData);
-		debug("Existing startTime: " + data.startTime + "  endTime: "
-				+ data.endTime);
+		debug("Existing startTime: " + tempData.startTime + "  endTime: "
+				+ accelData.endTime);
 		debug("New startTime: " + tempData.startTime + "  endTime: "
 				+ tempData.endTime);
 
@@ -69,7 +69,7 @@ function LineGraph(argsMap) {
 		if (tempData.step != newData.step) {
 			throw new Error(
 					"The step size on appended data must be the same as the existing data => "
-							+ data.step + " != " + tempData.step);
+							+ accelData.step + " != " + tempData.step);
 		}
 
 		if (tempData.values[0].length == 0) {
@@ -80,7 +80,7 @@ function LineGraph(argsMap) {
 		console.log("slide => add num new values: " + numSteps);
 		console.log(tempData.values[0])
 		tempData.values.forEach(function(dataArrays, i) {
-			var existingDataArrayForIndex = data.values[i];
+			var existingDataArrayForIndex = accelData.values[i];
 			dataArrays.forEach(function(v) {
 				console.log("slide => add new value: " + v);
 				// push each new value onto the existing data array
@@ -93,11 +93,11 @@ function LineGraph(argsMap) {
 
 		// shift domain by number of data elements we just added
 		// == numElements * step
-		data.startTime = new Date(data.startTime.getTime()
-				+ (data.step * numSteps));
-		data.endTime = tempData.endTime;
-		debug("Updated startTime: " + data.startTime + "  endTime: "
-				+ data.endTime);
+		accelData.startTime = new Date(tempData.startTime.getTime()
+				+ (tempData.step * numSteps));
+		accelData.endTime = tempData.endTime;
+		debug("Updated startTime: " + accelData.startTime + "  endTime: "
+				+ accelData.endTime);
 
 		/*
 		 * The following transition implementation was learned from examples at
@@ -115,7 +115,7 @@ function LineGraph(argsMap) {
 
 		// slide the lines left
 		graph.selectAll("g .lines path").attr("transform",
-				"translate(-" + x(numSteps * data.step) + ")");
+				"translate(" + x(numSteps * accelData.step) + ")");
 
 		handleDataUpdate();
 
@@ -195,7 +195,7 @@ function LineGraph(argsMap) {
 	var scales = [ [ 'linear', 'Linear' ], [ 'pow', 'Power' ], [ 'log', 'Log' ] ];
 	var hoverContainer, hoverLine, hoverLineXOffset, hoverLineYOffset, hoverLineGroup;
 	var legendFontSize = 12; // we can resize dynamically to make fit so we
-								// remember it here
+	// remember it here
 
 	// instance storage of data to be displayed
 	var data;
@@ -229,21 +229,21 @@ function LineGraph(argsMap) {
 		// margins with defaults (do this before processDataMap since it can
 		// modify the margins)
 		margin[0] = getOptionalVar(argsMap, 'marginTop', 20) // marginTop
-																// allows
-																// fitting the
-																// actions, date
-																// and top of
-																// axis labels
+		// allows
+		// fitting the
+		// actions, date
+		// and top of
+		// axis labels
 		margin[1] = getOptionalVar(argsMap, 'marginRight', 20)
 		margin[2] = getOptionalVar(argsMap, 'marginBottom', 35) // marginBottom
-																// allows
-																// fitting the
-																// legend along
-																// the bottom
+		// allows
+		// fitting the
+		// legend along
+		// the bottom
 		margin[3] = getOptionalVar(argsMap, 'marginLeft', 90) // marginLeft
-																// allows
-																// fitting the
-																// axis labels
+		// allows
+		// fitting the
+		// axis labels
 
 		// assign instance vars from dataMap
 		data = processDataMap(getRequiredVar(argsMap, 'data'));
@@ -265,7 +265,7 @@ function LineGraph(argsMap) {
 			if (TO !== false)
 				clearTimeout(TO);
 			TO = setTimeout(handleWindowResizeEvent, 200); // time in
-															// miliseconds
+			// miliseconds
 		});
 	}
 
@@ -656,7 +656,7 @@ function LineGraph(argsMap) {
 		}).attr("fill", "none").attr("stroke", function(d, i) {
 			return data.colors[i];
 		}).attr("d", lineFunction) // use the 'lineFunction' to create the data
-									// points in the correct x,y axis
+		// points in the correct x,y axis
 		.on('mouseover', function(d, i) {
 			handleMouseOverLine(d, i);
 		});
@@ -751,7 +751,7 @@ function LineGraph(argsMap) {
 				.attr("class", "scale-button").text(function(d, i) {
 					return d[1];
 				}).attr("font-size", "12") // this must be before "x" which
-											// dynamically determines width
+				// dynamically determines width
 				.attr("fill", function(d) {
 					if (d[0] == yScale) {
 						return "black";
@@ -807,15 +807,15 @@ function LineGraph(argsMap) {
 	 */
 	var createDateLabel = function() {
 		var date = new Date(); // placeholder just so we can calculate a valid
-								// width
+		// width
 		// create the date label to the left of the scaleButtons group
 		var buttonGroup = graph.append("svg:g").attr("class",
 				"date-label-group").append("svg:text").attr("class",
 				"date-label").attr("text-anchor", "end") // set at end so we
-															// can position at
-															// far right edge
-															// and add text from
-															// right to left
+		// can position at
+		// far right edge
+		// and add text from
+		// right to left
 		.attr("font-size", "10").attr("y", -4).attr("x", w).text(
 				date.toDateString() + " " + date.toLocaleTimeString())
 
@@ -1016,7 +1016,7 @@ function LineGraph(argsMap) {
 		// interpolated
 		var bucketDate = new Date(data.startTime.getTime() + data.step
 				* (index + 1)); // index+1 as it is 0 based but we need 1-based
-								// for this math
+		// for this math
 
 		var v = d[index];
 
