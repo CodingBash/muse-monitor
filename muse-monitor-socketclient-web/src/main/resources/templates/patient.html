@@ -69,6 +69,8 @@ path {
 
 
 	<div id="accel-graph"></div>
+	<div id="accel-mag-graph"></div>
+	<div id="gyro-mag-graph"></div>
 	<!-- load the d3.js library -->
 	<script src="http://d3js.org/d3.v3.min.js"></script>
 	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
@@ -76,10 +78,6 @@ path {
 		src="../static/node_modules/webstomp-client/dist/webstomp.min.js"
 		th:src="@{/node_modules/webstomp-client/dist/webstomp.min.js}"></script>
 	<script>
-		function rand() {
-			return Math.random();
-		}
-
 		var accel_data =  [ {
 			y : [],
 			mode : 'lines',
@@ -110,9 +108,41 @@ path {
 			line : {
 				width : 4
 			}
-		} ]
+		} ];
 		Plotly.plot('accel-graph', accel_data, {
 			xaxis: {range: [0, 50]}
+		});
+		
+		var accel_mag_data =  [ {
+			y : [],
+			mode : 'lines',
+			marker : {
+				color : 'pink',
+				size : 8
+			},
+			line : {
+				width : 4
+			}
+		} ];
+		Plotly.plot('accel-mag-graph', accel_mag_data, {
+			xaxis: {range: [0, 50]},
+			yaxis: {range: [0.75, 1.5]}
+		});
+		
+		var gyro_mag_data =  [ {
+			y : [],
+			mode : 'lines',
+			marker : {
+				color : 'pink',
+				size : 8
+			},
+			line : {
+				width : 4
+			}
+		} ];
+		Plotly.plot('gyro-mag-graph', gyro_mag_data, {
+			xaxis: {range: [0, 50]},
+			yaxis: {range: [0, 200]}
 		});
 	</script>
 	<script type="text/javascript">
@@ -143,20 +173,32 @@ path {
 		var subscriptions = {};
 		var cnt = 0;
 		setTimeout(function() {
-			subscriptions = {
+			subscriptions = { 
 				indicator : clients.a.subscribe("/topic/muse-verbose",
 						function(message) {
 							if (message.body) {
 								body = jsonEncoder.decode(message.body);
 								// TODO: Temporarily choose the accelX for testing
-								data_point = body.accelerometerData[0];
+								accel_point = body.accelerometerData[0];
+								gyro_point = body.gyroscopeData[0];
 								//console.log(body); 
-								if (cnt % 8 == 0) {
-									Plotly.extendTraces('accel-graph', {
-										y : [ [ data_point.accelX ],
-												[ data_point.accelY ], [data_point.accelZ] ]
-									}, [ 0, 1, 2 ]);
-									Plotly.relayout("accel-graph", {xaxis: {range: [accel_data[0].y.length - 50, accel_data[0].y.length]}});
+								if (cnt % 10 == 0) {
+									//Plotly.extendTraces('accel-graph', {
+										//y : [ [ accel_point .accelX ],
+											//	[ accel_point .accelY ], [accel_point .accelZ] ]
+									//}, [ 0, 1, 2 ]);
+									//Plotly.relayout("accel-graph", {xaxis: {range: [accel_data[0].y.length - 50, accel_data[0].y.length]}});
+									
+									Plotly.extendTraces('accel-mag-graph', {
+										y : [ [ Math.sqrt(Math.pow(accel_point .accelX, 2) + Math.pow(accel_point .accelY, 2) + Math.pow(accel_point .accelZ, 2)) ]]
+									}, [ 0]);
+									Plotly.relayout("accel-mag-graph", {xaxis: {range: [accel_mag_data[0].y.length - 50, accel_mag_data[0].y.length]}});
+									
+									Plotly.extendTraces('gyro-mag-graph', {
+										y : [ [ Math.sqrt(Math.pow(gyro_point.gyroX, 2) + Math.pow(gyro_point.gyroY, 2) + Math.pow(gyro_point.gyroZ, 2)) ]]
+									}, [0]);
+									Plotly.relayout("gyro-mag-graph", {xaxis: {range: [gyro_mag_data[0].y.length - 50, gyro_mag_data[0].y.length]}});
+									
 								}
 								cnt++;
 							}
