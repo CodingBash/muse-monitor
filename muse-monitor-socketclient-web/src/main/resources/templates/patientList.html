@@ -65,31 +65,40 @@
 			</div>
 			<div class="col-sm-9 col-lg-10">
 				<div class="row">
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<div class="row">
-								<div class="col-sm-3 text-center">
-									<img src="../static/img/profile.png"
-										th:src="@{img/profile.png}" class="profile-img" />
-								</div>
-								<div class="col-sm-5">
-									<h1>Basheer Becerra</h1>
-									<p style="font-size: 1.2em;">Room A104</p>
-								</div>
-								<div class="col-sm-4 text-center">
-									<div class="row">
-										<div class="col-sm-6">Mental Status</div>
-										<div class="col-sm-6">Physical Status</div>
+					<a href="patient.html" th:href="@{patient/123456}">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<div class="row">
+									<div class="col-sm-3 text-center">
+										<img src="../static/img/profile.png"
+											th:src="@{img/profile.png}" class="profile-img" />
 									</div>
-									<div class="row" style="padding-top: 10px;">
-										<div class="col-sm-6"><span class="glyphicon glyphicon-ok-circle muse-indicator" id="mental-indicator" aria-hidden="true"></span></div>
-										<div class="col-sm-6"><span class="glyphicon glyphicon-remove-circle muse-indicator" id="physical-indicator" aria-hidden="true"></span></div>
+									<div class="col-sm-5">
+										<h1>Basheer Becerra</h1>
+										<p style="font-size: 1.2em;">Room A104</p>
 									</div>
+									<div class="col-sm-4 text-center">
+										<div class="row">
+											<div class="col-sm-6">Mental Status</div>
+											<div class="col-sm-6">Physical Status</div>
+										</div>
+										<div class="row" style="padding-top: 10px;">
+											<div class="col-sm-6">
+												<span class="glyphicon glyphicon-ok-circle muse-indicator"
+													id="mental-indicator" aria-hidden="true"></span>
+											</div>
+											<div class="col-sm-6">
+												<span
+													class="glyphicon glyphicon-remove-circle muse-indicator"
+													id="physical-indicator" aria-hidden="true"></span>
+											</div>
+										</div>
 
+									</div>
 								</div>
 							</div>
 						</div>
-					</div>
+					</a>
 				</div>
 
 
@@ -104,6 +113,7 @@
 		integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
 		crossorigin="anonymous"></script>
 	<script type="text/javascript"
+		src="../static/node_modules/webstomp-client/dist/webstomp.min.js"
 		th:src="@{node_modules/webstomp-client/dist/webstomp.min.js}"></script>
 	<script type="text/javascript">
 		// TODO: Heartbeat implementation
@@ -140,13 +150,17 @@
 								console.log(body);
 								switch (body.physicalStatus) {
 								case "GOOD":
-									$("#physical-indicator").removeClass("glyphicon-remove-circle");
-									$("#physical-indicator").addClass("glyphicon-ok-circle");
+									$("#physical-indicator").removeClass(
+											"glyphicon-remove-circle");
+									$("#physical-indicator").addClass(
+											"glyphicon-ok-circle");
 									console.log("GOOD");
 									break;
 								case "EMERGENCY":
-									$("#physical-indicator").removeClass("glyphicon-ok-circle");
-									$("#physical-indicator").addClass("glyphicon-remove-circle");
+									$("#physical-indicator").removeClass(
+											"glyphicon-ok-circle");
+									$("#physical-indicator").addClass(
+											"glyphicon-remove-circle");
 									console.log("EMERGENCY");
 									break;
 								default:
