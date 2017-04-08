@@ -68,30 +68,53 @@ path {
 
 
 
-	<div id="graph1" class="aGraph"
-		style="position: relative; width: 100%; height: 400px"></div>
-
+	<div id="accel-graph"></div>
 	<!-- load the d3.js library -->
 	<script src="http://d3js.org/d3.v3.min.js"></script>
-	<script type="text/javascript" src="../static/scripts/line-graph.js"
-		th:src="@{/scripts/line-graph.js}"></script>
-	<script type="text/javascript" src="../static/data/sample_data.js"
-		th:src="@{/data/sample_data.js}"></script>
-	<script>
-		accelData["displayNames"] = [ "2xx" ];
-		accelData["colors"] = [ "green" ];
-		accelData["scale"] = "pow";
-
-		// create graph now that we've added presentation config
-		var l1 = new LineGraph({
-			containerId : 'graph1',
-			data : accelData
-		});
-	</script>
-
+	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 	<script type="text/javascript"
 		src="../static/node_modules/webstomp-client/dist/webstomp.min.js"
 		th:src="@{/node_modules/webstomp-client/dist/webstomp.min.js}"></script>
+	<script>
+		function rand() {
+			return Math.random();
+		}
+
+		var accel_data =  [ {
+			y : [],
+			mode : 'lines',
+			marker : {
+				color : 'pink',
+				size : 8
+			},
+			line : {
+				width : 4
+			}
+		}, {
+			y : [],
+			mode : 'lines',
+			marker : {
+				color : 'gray',
+				size : 8
+			},
+			line : {
+				width : 4
+			}
+		},  {
+			y : [],
+			mode : 'lines',
+			marker : {
+				color : 'blue',
+				size : 8
+			},
+			line : {
+				width : 4
+			}
+		} ]
+		Plotly.plot('accel-graph', accel_data, {
+			xaxis: {range: [0, 50]}
+		});
+	</script>
 	<script type="text/javascript">
 		// TODO: Heartbeat implementation
 		var url = "wss://muse-monitor-socketserver.herokuapp.com/muse-ws";
@@ -118,36 +141,28 @@ path {
 
 		var delayMillis = 2000; //1 second
 		var subscriptions = {};
-		setTimeout(
-				function() {
-					subscriptions = {
-						indicator : clients.a
-								.subscribe(
-										"/topic/muse-verbose",
-										function(message) {
-											if (message.body) {
-												body = jsonEncoder
-														.decode(message.body);
-												// TODO: Temporarily choose the accelX for testing
-												data_point = body.accelerometerData[0];
-												//console.log(body); 
-
-												var newData = [];
-												if (dataA.start == 1336681080000) {
-													// First entry
-													accelData.start = dataA.start = data_point.timeMillis;
-													accelData.end = dataA.end = data_point.timeMillis; // Start + 1 minute
-												}
-												accelData.values[0]
-														.push(data_point.accelX);
-												dataA.end = dataA.end
-														+ dataA.step;
-												dataA.values = [ [ data_point.accelX ] ];
-												l1.slideData(dataA);
-											}
-										})
-					};
-				}, delayMillis);
+		var cnt = 0;
+		setTimeout(function() {
+			subscriptions = {
+				indicator : clients.a.subscribe("/topic/muse-verbose",
+						function(message) {
+							if (message.body) {
+								body = jsonEncoder.decode(message.body);
+								// TODO: Temporarily choose the accelX for testing
+								data_point = body.accelerometerData[0];
+								//console.log(body); 
+								if (cnt % 8 == 0) {
+									Plotly.extendTraces('accel-graph', {
+										y : [ [ data_point.accelX ],
+												[ data_point.accelY ], [data_point.accelZ] ]
+									}, [ 0, 1, 2 ]);
+									Plotly.relayout("accel-graph", {xaxis: {range: [accel_data[0].y.length - 50, accel_data[0].y.length]}});
+								}
+								cnt++;
+							}
+						})
+			};
+		}, delayMillis);
 	</script>
 </body>
 </html>
