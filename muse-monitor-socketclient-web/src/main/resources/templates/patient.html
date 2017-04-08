@@ -68,7 +68,6 @@ path {
 
 
 
-	<div id="accel-graph"></div>
 	<div id="accel-mag-graph"></div>
 	<div id="gyro-mag-graph"></div>
 	<!-- load the d3.js library -->
@@ -78,41 +77,6 @@ path {
 		src="../static/node_modules/webstomp-client/dist/webstomp.min.js"
 		th:src="@{/node_modules/webstomp-client/dist/webstomp.min.js}"></script>
 	<script>
-		var accel_data =  [ {
-			y : [],
-			mode : 'lines',
-			marker : {
-				color : 'pink',
-				size : 8
-			},
-			line : {
-				width : 4
-			}
-		}, {
-			y : [],
-			mode : 'lines',
-			marker : {
-				color : 'gray',
-				size : 8
-			},
-			line : {
-				width : 4
-			}
-		},  {
-			y : [],
-			mode : 'lines',
-			marker : {
-				color : 'blue',
-				size : 8
-			},
-			line : {
-				width : 4
-			}
-		} ];
-		Plotly.plot('accel-graph', accel_data, {
-			xaxis: {range: [0, 50]}
-		});
-		
 		var accel_mag_data =  [ {
 			y : [],
 			mode : 'lines',
@@ -183,11 +147,6 @@ path {
 								gyro_point = body.gyroscopeData[0];
 								//console.log(body); 
 								if (cnt % 7 == 0) {
-									//Plotly.extendTraces('accel-graph', {
-										//y : [ [ accel_point .accelX ],
-											//	[ accel_point .accelY ], [accel_point .accelZ] ]
-									//}, [ 0, 1, 2 ]);
-									//Plotly.relayout("accel-graph", {xaxis: {range: [accel_data[0].y.length - 50, accel_data[0].y.length]}});
 									var x_range = 25;
 									Plotly.extendTraces('accel-mag-graph', {
 										y : [ [ Math.sqrt(Math.pow(accel_point .accelX, 2) + Math.pow(accel_point .accelY, 2) + Math.pow(accel_point .accelZ, 2)) ]]
