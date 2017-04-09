@@ -47,153 +47,171 @@
                 android:text="@string/disconnect" />
         </LinearLayout>
     </LinearLayout>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:textSize="16sp"
-        android:text="@string/status" />
+        android:text="@string/status"
+        android:textColor="@color/colorPrimary"
+        android:textSize="16sp" />
+
     <TextView
         android:id="@+id/con_status"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="fill_parent"
         android:layout_weight="1"
-        android:textSize="16sp"
-        android:text="@string/undefined" />
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:textSize="16sp"
-        android:text="@string/eeg" />
+        android:text="@string/undefined"
+        android:textColor="@color/colorPrimary"
+        android:textSize="16sp" />
 
-    <!-- EEG DATA -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:orientation="horizontal" >
-        <TextView
-            android:id="@+id/eeg_tp9"
-            android:layout_width="match_parent"
+
+        <TableLayout
+            android:layout_width="fill_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:textSize="16sp"
-            android:text="@string/init_val" />
-        <TextView
-            android:id="@+id/eeg_af7"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:textSize="16sp"
-            android:text="@string/init_val" />
-        <TextView
-            android:id="@+id/eeg_af8"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:textSize="16sp"
-            android:text="@string/init_val" />
-        <TextView
-            android:id="@+id/eeg_tp10"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:textSize="16sp"
-            android:text="@string/init_val" />
+            android:background="#000000"
+            android:theme="@style/Base.CardView">
+
+            <TableRow
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="1dp"
+                android:background="#FFFFFF">
+
+                <TextView
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="@string/eeg"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/eeg_tp9"
+                    android:layout_width="20dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="@string/init_val"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/eeg_af7"
+                    android:layout_width="20dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="@string/init_val"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/eeg_af8"
+                    android:layout_width="20dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="@string/init_val"
+                    android:textSize="16sp" />
+
+            </TableRow>
+
+            <TableRow
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="1dp"
+                android:background="#FFFFFF">
+
+                <TextView
+                    android:id="@+id/textView4"
+                    android:layout_width="60dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="@string/accel"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/acc_x"
+                    android:layout_width="20dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="@string/init_val"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/acc_y"
+                    android:layout_width="20dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="@string/init_val"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/acc_z"
+                    android:layout_width="20dp"
+                    android:layout_height="match_parent"
+                    android:layout_span="2"
+                    android:layout_weight="1"
+                    android:text="@string/init_val"
+                    android:textSize="16sp" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="1dp"
+                android:background="#FFFFFF">
+
+                <TextView
+                    android:layout_width="60dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="@string/muse_elem"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/elem1"
+                    android:layout_width="20dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="@string/init_val"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/elem2"
+                    android:layout_width="20dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="@string/init_val"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/elem3"
+                    android:layout_width="20dp"
+                    android:layout_height="match_parent"
+                    android:layout_span="2"
+                    android:layout_weight="1"
+                    android:text="@string/init_val"
+                    android:textSize="16sp" />
+            </TableRow>
+        </TableLayout>
     </LinearLayout>
 
-    <!-- ACCELL DATA -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:textSize="16sp"
-        android:text="@string/accel" />
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="horizontal" >
-        <TextView
-            android:id="@+id/acc_x"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:textSize="16sp"
-            android:text="@string/init_val" />
-        <TextView
-            android:id="@+id/acc_y"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:textSize="16sp"
-            android:text="@string/init_val" />
-        <TextView
-            android:id="@+id/acc_z"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:textSize="16sp"
-            android:text="@string/init_val" />
-    </LinearLayout>
-
-    <!-- ALPHA DATA -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:textSize="16sp"
-        android:text="@string/muse_elem" />
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="horizontal" >
-        <TextView
-            android:id="@+id/elem1"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:textSize="16sp"
-            android:text="@string/init_val" />
-        <TextView
-            android:id="@+id/elem2"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:textSize="16sp"
-            android:text="@string/init_val" />
-        <TextView
-            android:id="@+id/elem3"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:textSize="16sp"
-            android:text="@string/init_val" />
-    </LinearLayout>
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:textSize="16sp"
-        android:text="@string/version" />
-    <TextView
-        android:id="@+id/version"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:textSize="16sp"
-        android:text="@string/undefined" />
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="45dp"
-        android:orientation="horizontal" >
+        android:orientation="horizontal"
+        android:gravity="center">
+
         <Button
             android:id="@+id/pause"
             android:layout_width="150dp"
             android:layout_height="40dp"
             android:text="@string/pause" />
+
     </LinearLayout>
 
 </LinearLayout>
