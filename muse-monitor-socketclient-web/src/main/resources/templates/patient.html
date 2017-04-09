@@ -23,6 +23,9 @@
 	integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
 	crossorigin="anonymous" />
 
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet"
+	href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css" />
 <link href="../static/css/navbar-fixed-side.css"
 	th:href="@{/css/navbar-fixed-side.css}" rel="stylesheet"></link>
 <link href="../static/css/custom.css" th:href="@{/css/custom.css}"
@@ -55,6 +58,11 @@ path {
 }
 
 div[id*="graph"] {
+	width: 80%;
+	margin: auto;
+}
+
+#emergency-statuses {
 	width: 80%;
 	margin: auto;
 }
@@ -124,6 +132,18 @@ div[id*="graph"] {
 					</div>
 					<div class="panel-body">
 						<div class="row">
+							<table id="emergency-statuses">
+								<thead>
+									<tr>
+										<th>TIME</th>
+										<th>STATUS</th>
+									</tr>
+								</thead>
+								<tbody>
+								</tbody>
+							</table>
+						</div>
+						<div class="row">
 							<div id="accel-mag-graph"></div>
 						</div>
 						<div class="row">
@@ -139,6 +159,7 @@ div[id*="graph"] {
 
 		</div>
 	</div>
+
 	<script src="https://code.jquery.com/jquery-3.2.1.min.js"
 		integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
 		crossorigin="anonymous"></script>
@@ -148,13 +169,19 @@ div[id*="graph"] {
 		src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
 		integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
 		crossorigin="anonymous"></script>
-
+	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 	<!-- load the d3.js library -->
 	<script src="http://d3js.org/d3.v3.min.js"></script>
-	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+	<script
+		src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
 	<script type="text/javascript"
 		src="../static/node_modules/webstomp-client/dist/webstomp.min.js"
 		th:src="@{/node_modules/webstomp-client/dist/webstomp.min.js}"></script>
+	<script>
+		var t = $('#emergency-statuses').DataTable({
+			aaSorting: [[0, 'des']]
+		})
+	</script>
 	<script>
 		var accel_mag_data = [ {
 			y : [],
@@ -202,6 +229,7 @@ div[id*="graph"] {
 	</script>
 	<script type="text/javascript">
 		// TODO: Heartbeat implementation
+		//<![CDATA[
 		var url = "wss://muse-monitor-socketserver.herokuapp.com/muse-ws";
 		var clients = {
 			a : webstomp.client(url)
@@ -344,6 +372,33 @@ div[id*="graph"] {
 													$("#physical-indicator")
 															.addClass(
 																	"glyphicon-remove-circle");
+													var date = new Date(
+															body.timeMillis);
+													var sign = "AM";
+													var hours = date.getHours();
+													if (hours > 12) {
+														sign = "PM";
+														hours = hours - 12;
+													}
+
+													var minutes = "";
+													if (date.getMinutes() < 10) {
+														minutes = "0"
+																+ date
+																		.getMinutes();
+													} else {
+														minutes = date
+																.getMinutes();
+													}
+													t.row
+															.add(
+																	[
+																			hours
+																					+ ":"
+																					+ minutes
+																					+ sign,
+																			"PHYSICAL EMERGENCY" ])
+															.draw(false);
 													console.log("EMERGENCY");
 													break;
 												default:
@@ -355,6 +410,7 @@ div[id*="graph"] {
 										})
 					};
 				}, delayMillis);
+		//]]>
 	</script>
 </body>
 </html>

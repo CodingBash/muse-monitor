@@ -151,6 +151,7 @@ public class WebsocketController {
 		}
 		
 		if(newStatus){
+			outboundIndicatorPayload.setTimeMillis(inboundPayload.getTimeMills());
 			LOG.info("SENDING INDICATOR PAYLOAD: " + gson.toJson(outboundIndicatorPayload));
 			template.convertAndSend(TOPIC_INDICATOR, outboundIndicatorPayload);
 		}

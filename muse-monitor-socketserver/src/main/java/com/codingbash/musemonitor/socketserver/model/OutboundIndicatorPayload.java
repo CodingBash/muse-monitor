@@ -2,6 +2,7 @@ package com.codingbash.musemonitor.socketserver.model;
 
 public class OutboundIndicatorPayload {
 	private String patientId;
+	private long timeMillis;
 	private MentalStatus mentalStatus;
 	private PhysicalStatus physicalStatus;
 
@@ -11,6 +12,14 @@ public class OutboundIndicatorPayload {
 
 	public void setPatientId(String patientId) {
 		this.patientId = patientId;
+	}
+
+	public long getTimeMillis() {
+		return timeMillis;
+	}
+
+	public void setTimeMillis(long timeMillis) {
+		this.timeMillis = timeMillis;
 	}
 
 	public MentalStatus getMentalStatus() {
