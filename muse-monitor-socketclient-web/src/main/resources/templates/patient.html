@@ -63,6 +63,11 @@ div[id*="graph"] {
 }
 
 #emergency-statuses {
+	width: 80% !important;
+	margin: auto;
+}
+
+.table-row {
 	width: 80%;
 	margin: auto;
 }
@@ -131,7 +136,7 @@ div[id*="graph"] {
 						</div>
 					</div>
 					<div class="panel-body">
-						<div class="row">
+						<div class="row table-row">
 							<table id="emergency-statuses">
 								<thead>
 									<tr>
@@ -179,7 +184,7 @@ div[id*="graph"] {
 		th:src="@{/node_modules/webstomp-client/dist/webstomp.min.js}"></script>
 	<script>
 		var t = $('#emergency-statuses').DataTable({
-			aaSorting: [[0, 'des']]
+			aaSorting : [ [ 0, 'des' ] ]
 		})
 	</script>
 	<script>
@@ -226,6 +231,9 @@ div[id*="graph"] {
 				range : [ 0, 200 ]
 			}
 		});
+		window.onresize = function() {
+			Plotly.Plots.resize(gd);
+		};
 	</script>
 	<script type="text/javascript">
 		// TODO: Heartbeat implementation
