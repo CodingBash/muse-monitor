@@ -6,7 +6,7 @@ package com.codingbash.musemonitor.socketserver.model;
  * @author bbece
  *
  */
-public class IndicatorWrapper {
+public class FallIndicatorWrapper {
 
 	/**
 	 * TRUE: Acc < LFT in last 0.5s FALSE: contrary
