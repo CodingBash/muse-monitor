@@ -9,3 +9,4 @@
 .externalNativeBuild
 /app/libs
 /app/src/main/jniLibs/armeabi-v7a
+/.idea/misc.xml
