@@ -251,6 +251,61 @@ div[id*="graph"] {
 			line : {
 				width : 4
 			}
+		}, {
+			name : 'EEG_2',
+			y : [],
+			mode : 'lines',
+			marker : {
+				color : 'red',
+				size : 8
+			},
+			line : {
+				width : 4
+			}
+		}, {
+			name : 'EEG_3',
+			y : [],
+			mode : 'lines',
+			marker : {
+				color : 'pink',
+				size : 8
+			},
+			line : {
+				width : 4
+			}
+		}, {
+			name : 'EEG_4',
+			y : [],
+			mode : 'lines',
+			marker : {
+				color : 'green',
+				size : 8
+			},
+			line : {
+				width : 4
+			}
+		}, {
+			name : 'AUX_LEFT',
+			y : [],
+			mode : 'lines',
+			marker : {
+				color : 'orange',
+				size : 8
+			},
+			line : {
+				width : 4
+			}
+		}, {
+			name : 'AUX_RIGHT',
+			y : [],
+			mode : 'lines',
+			marker : {
+				color : 'purple',
+				size : 8
+			},
+			line : {
+				width : 4
+			}
 		}];
 		Plotly.plot('eeg-graph', eeg_data, {
 			title : 'EEG Data',
@@ -259,14 +314,14 @@ div[id*="graph"] {
 			},
 			yaxis : {
 				title : "Value",
-				range : [0, 200]
+				range : [700, 1000]
 			}
 		});
 
 		// TODO: Get this resizing working...
-		window.onresize = function() {
-			Plotly.Plots.resize(gd); // TODO: Where's gd coming from?
-		};
+		//window.onresize = function(gd) {
+		//	Plotly.Plots.resize(gd); // TODO: Where's gd coming from?
+		//};
 	</script>
 	<script type="text/javascript">
 		// TODO: Heartbeat implementation
@@ -296,6 +351,11 @@ div[id*="graph"] {
 		var delayMillis = 2000; //1 second
 		var subscriptions = {};
 		var cnt = 0;
+		var data_holder = {
+				accel_data_holder : [[]],
+				gyro_data_holder : [[]],
+				eeg_data_holder : [[], [], [], [], [], []]
+			}
 		setTimeout(function() {
 			subscriptions = {
 				indicator : clients.a.subscribe("/topic/muse-verbose", function(message) {
@@ -305,31 +365,65 @@ div[id*="graph"] {
 						gyro_point = body.gyroscopeData[0];
 						eeg_point = body.eegData[0];
 						//console.log(body); 
-						if (cnt % 7 == 0) {
-							var x_range = 25;
+						if (cnt % 1 == 0) {
+							// ADD ALL DATA TO DATA HOLDER
+							data_holder.accel_data_holder[0].push(Math.sqrt(Math.pow(accel_point.accelX, 2) + Math.pow(accel_point.accelY, 2) + Math.pow(accel_point.accelZ, 2)));
+							data_holder.gyro_data_holder[0].push(Math.sqrt(Math.pow(gyro_point.gyroX, 2) + Math.pow(gyro_point.gyroY, 2) + Math.pow(gyro_point.gyroZ, 2)));
+							data_holder.eeg_data_holder[0].push(eeg_point.eeg1);
+							data_holder.eeg_data_holder[1].push(eeg_point.eeg2);
+							data_holder.eeg_data_holder[2].push(eeg_point.eeg3);
+							data_holder.eeg_data_holder[3].push(eeg_point.eeg4);
+							data_holder.eeg_data_holder[4].push(eeg_point.auxLeft);
+							data_holder.eeg_data_holder[5].push(eeg_point.auxRight);
 
-							// ADD TO ACCELLERATION
-							Plotly.extendTraces('accel-mag-graph', {
-								y : [[Math.sqrt(Math.pow(accel_point.accelX, 2) + Math.pow(accel_point.accelY, 2) + Math.pow(accel_point.accelZ, 2))]]
-							}, [0]);
-							accel_mag_data[0].y = accel_mag_data[0].y.slice(Math.max(accel_mag_data[0].y.length - x_range, 0));
-							Plotly.relayout("accel-mag-graph", {
-								xaxis : {
-									range : [accel_mag_data[0].y.length - x_range, accel_mag_data[0].y.length]
-								}
-							});
+							// REFRESH PLOTLY GRAPHS
+							if (cnt % 20 == 0) {
+								var x_range = 100;
 
-							// 
-							Plotly.extendTraces('gyro-mag-graph', {
-								y : [[Math.sqrt(Math.pow(gyro_point.gyroX, 2) + Math.pow(gyro_point.gyroY, 2) + Math.pow(gyro_point.gyroZ, 2))]]
-							}, [0]);
-							gyro_mag_data[0].y = gyro_mag_data[0].y.slice(Math.max(gyro_mag_data[0].y.length - x_range, 0));
-							Plotly.relayout("gyro-mag-graph", {
-								xaxis : {
-									range : [gyro_mag_data[0].y.length - x_range, gyro_mag_data[0].y.length]
-								}
-							});
+								// ADD TO ACCELLERATION
+								Plotly.extendTraces('accel-mag-graph', {
+									y : data_holder.accel_data_holder
+								}, [0]);
+								accel_mag_data[0].y = accel_mag_data[0].y.slice(Math.max(accel_mag_data[0].y.length - x_range, 0));
+								Plotly.relayout("accel-mag-graph", {
+									xaxis : {
+										range : [accel_mag_data[0].y.length - x_range, accel_mag_data[0].y.length]
+									}
+								});
 
+								// ADD TO GYRO
+								Plotly.extendTraces('gyro-mag-graph', {
+									y : data_holder.gyro_data_holder
+								}, [0]);
+								gyro_mag_data[0].y = gyro_mag_data[0].y.slice(Math.max(gyro_mag_data[0].y.length - x_range, 0));
+								Plotly.relayout("gyro-mag-graph", {
+									xaxis : {
+										range : [gyro_mag_data[0].y.length - x_range, gyro_mag_data[0].y.length]
+									}
+								});
+
+								// ADD TO EEG
+								// TODO: Do rest of traces + independent axis
+								Plotly.extendTraces('eeg-graph', {
+									y : data_holder.eeg_data_holder
+								}, [0, 1, 2, 3, 4, 5]);
+								eeg_data[0].y = eeg_data[0].y.slice(Math.max(eeg_data[0].y.length - x_range, 0));
+								eeg_data[1].y = eeg_data[1].y.slice(Math.max(eeg_data[1].y.length - x_range, 0));
+								eeg_data[2].y = eeg_data[2].y.slice(Math.max(eeg_data[2].y.length - x_range, 0));
+								eeg_data[3].y = eeg_data[3].y.slice(Math.max(eeg_data[3].y.length - x_range, 0));
+								eeg_data[4].y = eeg_data[4].y.slice(Math.max(eeg_data[4].y.length - x_range, 0));
+								eeg_data[5].y = eeg_data[5].y.slice(Math.max(eeg_data[5].y.length - x_range, 0));
+								Plotly.relayout("eeg-graph", {
+									xaxis : {
+										range : [eeg_data[0].y.length - x_range, eeg_data[0].y.length]
+									}
+								});
+								
+								// REFRESH THE DICT
+								data_holder.accel_data_holder = [[]];
+								data_holder.gyro_data_holder = [[]];
+								data_holder.eeg_data_holder = [[], [], [], [], [], []];
+							}
 						}
 						cnt++;
 					}
