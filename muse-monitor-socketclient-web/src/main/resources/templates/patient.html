@@ -186,275 +186,272 @@ div[id*="graph"] {
 		src="../static/node_modules/webstomp-client/dist/webstomp.min.js"
 		th:src="@{/node_modules/webstomp-client/dist/webstomp.min.js}"></script>
 	<script>
-		var t = $('#emergency-statuses').DataTable({
-			aaSorting : [ [ 0, 'des' ] ]
-		})
-	</script>
+	var t = $('#emergency-statuses').DataTable({
+	    aaSorting : [ [ 0, 'des' ] ]
+	})
+    </script>
 	<script>
-		// ACCELERATION MAGNITUDE
-		var accel_mag_data = [ {
-			name: 'Magnitude',
-			y : [],
-			mode : 'lines',
-			marker : {
-				color : 'red',
-				size : 8
-			},
-			line : {
-				width : 4
-			}
-		} ];
-		Plotly.plot('accel-mag-graph', accel_mag_data, {
-			title : "Acceleration Magnitude",
-			xaxis : {
-				range : [ 0, 50 ]
-			},
-			yaxis : {
-				title : "Value",
-				range : [ 0.75, 1.5 ]
-			}
-		});
+	// ACCELERATION MAGNITUDE
+	var accel_mag_data = [ {
+	    name : 'Magnitude',
+	    y : [],
+	    mode : 'lines',
+	    marker : {
+		color : 'red',
+		size : 8
+	    },
+	    line : {
+		width : 4
+	    }
+	} ];
+	Plotly.plot('accel-mag-graph', accel_mag_data, {
+	    title : "Acceleration Magnitude",
+	    xaxis : {
+		range : [ 0, 50 ]
+	    },
+	    yaxis : {
+		title : "Value",
+		range : [ 0.75, 1.5 ]
+	    }
+	});
 
-		// GYROSCOPE MAGNITUDE
-		var gyro_mag_data = [ {
-			name: 'Magnitude',
-			y : [],
-			mode : 'lines',
-			marker : {
-				color : 'blue',
-				size : 8
-			},
-			line : {
-				width : 4
-			}
-		} ];
-		Plotly.plot('gyro-mag-graph', gyro_mag_data, {
-			title : 'Gyroscope Magnitude',
-			xaxis : {
-				range : [ 0, 50 ]
-			},
-			yaxis : {
-				title : "Value",
-				range : [ 0, 200 ]
-			}
-		});
-		
-		// EEG MAGNITUDE
-		var eeg_data = [ {
-			name: 'EEG_1',
-			y : [],
-			mode : 'lines',
-			marker : {
-				color : 'blue',
-				size : 8
-			},
-			line : {
-				width : 4
-			}
-		} ];
-		Plotly.plot('eeg-graph', eeg_data, {
-			title : 'EEG Data',
-			xaxis : {
-				range : [ 0, 50 ]
-			},
-			yaxis : {
-				title : "Value",
-				range : [ 0, 200 ]
-			}
-		});
-		
-		
-		
-		
-		// TODO: Get this resizing working...
-		window.onresize = function() {
-			Plotly.Plots.resize(gd); // TODO: Where's gd coming from?
-		};
-	</script>
+	// GYROSCOPE MAGNITUDE
+	var gyro_mag_data = [ {
+	    name : 'Magnitude',
+	    y : [],
+	    mode : 'lines',
+	    marker : {
+		color : 'blue',
+		size : 8
+	    },
+	    line : {
+		width : 4
+	    }
+	} ];
+	Plotly.plot('gyro-mag-graph', gyro_mag_data, {
+	    title : 'Gyroscope Magnitude',
+	    xaxis : {
+		range : [ 0, 50 ]
+	    },
+	    yaxis : {
+		title : "Value",
+		range : [ 0, 200 ]
+	    }
+	});
+
+	// EEG MAGNITUDE
+	var eeg_data = [ {
+	    name : 'EEG_1',
+	    y : [],
+	    mode : 'lines',
+	    marker : {
+		color : 'blue',
+		size : 8
+	    },
+	    line : {
+		width : 4
+	    }
+	} ];
+	Plotly.plot('eeg-graph', eeg_data, {
+	    title : 'EEG Data',
+	    xaxis : {
+		range : [ 0, 50 ]
+	    },
+	    yaxis : {
+		title : "Value",
+		range : [ 0, 200 ]
+	    }
+	});
+
+	// TODO: Get this resizing working...
+	window.onresize = function() {
+	    Plotly.Plots.resize(gd); // TODO: Where's gd coming from?
+	};
+    </script>
 	<script type="text/javascript">
-		// TODO: Heartbeat implementation
-		//<![CDATA[
-		var url = "wss://muse-monitor-socketserver.herokuapp.com/muse-ws";
-		var clients = {
-			a : webstomp.client(url)
-		}
+	// TODO: Heartbeat implementation
+	//<![CDATA[
+	var url = "wss://muse-monitor-socketserver.herokuapp.com/muse-ws";
+	var clients = {
+	    a : webstomp.client(url)
+	}
 
-		var jsonEncoder = {
-			encode : function(msg) {
-				return JSON.stringify(msg);
-			},
-			decode : function(msg) {
-				return JSON.parse(msg);
-			}
-		};
-		var encoder = {
-			encode : jsonEncoder.encode,
-			decode : jsonEncoder.decode
-		}
-		clients.a.heartbeat.outgoing = 20000; // client will send heartbeats every 20000ms
-		clients.a.heartbeat.incoming = 0;
-		clients.a.connect({}, function(evt) {
-		});
+	var jsonEncoder = {
+	    encode : function(msg) {
+		return JSON.stringify(msg);
+	    },
+	    decode : function(msg) {
+		return JSON.parse(msg);
+	    }
+	};
+	var encoder = {
+	    encode : jsonEncoder.encode,
+	    decode : jsonEncoder.decode
+	}
+	clients.a.heartbeat.outgoing = 20000; // client will send heartbeats every 20000ms
+	clients.a.heartbeat.incoming = 0;
+	clients.a.connect({}, function(evt) {
+	});
 
-		var delayMillis = 2000; //1 second
-		var subscriptions = {};
-		var cnt = 0;
-		setTimeout(
-				function() {
-					subscriptions = {
-						indicator : clients.a
-								.subscribe(
-										"/topic/muse-verbose",
-										function(message) {
-											if (message.body) {
-												body = jsonEncoder
-														.decode(message.body);
-												// TODO: Temporarily choose the accelX for testing
-												accel_point = body.accelerometerData[0];
-												gyro_point = body.gyroscopeData[0];
-												//console.log(body); 
-												if (cnt % 7 == 0) {
-													var x_range = 25;
-													Plotly
-															.extendTraces(
-																	'accel-mag-graph',
-																	{
-																		y : [ [ Math
-																				.sqrt(Math
-																						.pow(
-																								accel_point.accelX,
-																								2)
-																						+ Math
-																								.pow(
-																										accel_point.accelY,
-																										2)
-																						+ Math
-																								.pow(
-																										accel_point.accelZ,
-																										2)) ] ]
-																	}, [ 0 ]);
-													accel_mag_data[0].y = accel_mag_data[0].y
-															.slice(Math
-																	.max(
-																			accel_mag_data[0].y.length
-																					- x_range,
-																			0));
-													Plotly
-															.relayout(
-																	"accel-mag-graph",
-																	{
-																		xaxis : {
-																			range : [
-																					accel_mag_data[0].y.length
-																							- x_range,
-																					accel_mag_data[0].y.length ]
-																		}
-																	});
+	var delayMillis = 2000; //1 second
+	var subscriptions = {};
+	var cnt = 0;
+	setTimeout(
+		function() {
+		    subscriptions = {
+			indicator : clients.a
+				.subscribe(
+					"/topic/muse-verbose",
+					function(message) {
+					    if (message.body) {
+						body = jsonEncoder
+							.decode(message.body);
+						// TODO: Temporarily choose the accelX for testing
+						accel_point = body.accelerometerData[0];
+						gyro_point = body.gyroscopeData[0];
+						//console.log(body); 
+						if (cnt % 7 == 0) {
+						    var x_range = 25;
+						    Plotly
+							    .extendTraces(
+								    'accel-mag-graph',
+								    {
+									y : [ [ Math
+										.sqrt(Math
+											.pow(
+												accel_point.accelX,
+												2)
+											+ Math
+												.pow(
+													accel_point.accelY,
+													2)
+											+ Math
+												.pow(
+													accel_point.accelZ,
+													2)) ] ]
+								    }, [ 0 ]);
+						    accel_mag_data[0].y = accel_mag_data[0].y
+							    .slice(Math
+								    .max(
+									    accel_mag_data[0].y.length
+										    - x_range,
+									    0));
+						    Plotly
+							    .relayout(
+								    "accel-mag-graph",
+								    {
+									xaxis : {
+									    range : [
+										    accel_mag_data[0].y.length
+											    - x_range,
+										    accel_mag_data[0].y.length ]
+									}
+								    });
 
-													Plotly
-															.extendTraces(
-																	'gyro-mag-graph',
-																	{
-																		y : [ [ Math
-																				.sqrt(Math
-																						.pow(
-																								gyro_point.gyroX,
-																								2)
-																						+ Math
-																								.pow(
-																										gyro_point.gyroY,
-																										2)
-																						+ Math
-																								.pow(
-																										gyro_point.gyroZ,
-																										2)) ] ]
-																	}, [ 0 ]);
-													gyro_mag_data[0].y = gyro_mag_data[0].y
-															.slice(Math
-																	.max(
-																			gyro_mag_data[0].y.length
-																					- x_range,
-																			0));
-													Plotly
-															.relayout(
-																	"gyro-mag-graph",
-																	{
-																		xaxis : {
-																			range : [
-																					gyro_mag_data[0].y.length
-																							- x_range,
-																					gyro_mag_data[0].y.length ]
-																		}
-																	});
+						    Plotly
+							    .extendTraces(
+								    'gyro-mag-graph',
+								    {
+									y : [ [ Math
+										.sqrt(Math
+											.pow(
+												gyro_point.gyroX,
+												2)
+											+ Math
+												.pow(
+													gyro_point.gyroY,
+													2)
+											+ Math
+												.pow(
+													gyro_point.gyroZ,
+													2)) ] ]
+								    }, [ 0 ]);
+						    gyro_mag_data[0].y = gyro_mag_data[0].y
+							    .slice(Math
+								    .max(
+									    gyro_mag_data[0].y.length
+										    - x_range,
+									    0));
+						    Plotly
+							    .relayout(
+								    "gyro-mag-graph",
+								    {
+									xaxis : {
+									    range : [
+										    gyro_mag_data[0].y.length
+											    - x_range,
+										    gyro_mag_data[0].y.length ]
+									}
+								    });
 
-												}
-												cnt++;
-											}
-										}),
-						indicator : clients.a
-								.subscribe(
-										"/topic/muse-indicator",
-										function(message) {
-											if (message.body) {
-												body = jsonEncoder
-														.decode(message.body);
-												console.log(body);
-												switch (body.physicalStatus) {
-												case "GOOD":
-													$("#physical-indicator")
-															.removeClass(
-																	"glyphicon-remove-circle");
-													$("#physical-indicator")
-															.addClass(
-																	"glyphicon-ok-circle");
-													console.log("GOOD");
-													break;
-												case "EMERGENCY":
-													$("#physical-indicator")
-															.removeClass(
-																	"glyphicon-ok-circle");
-													$("#physical-indicator")
-															.addClass(
-																	"glyphicon-remove-circle");
-													var date = new Date(
-															body.timeMillis);
-													var sign = "AM";
-													var hours = date.getHours();
-													if (hours > 12) {
-														sign = "PM";
-														hours = hours - 12;
-													}
+						}
+						cnt++;
+					    }
+					}),
+			indicator : clients.a
+				.subscribe(
+					"/topic/muse-indicator",
+					function(message) {
+					    if (message.body) {
+						body = jsonEncoder
+							.decode(message.body);
+						console.log(body);
+						switch (body.physicalStatus) {
+						case "GOOD":
+						    $("#physical-indicator")
+							    .removeClass(
+								    "glyphicon-remove-circle");
+						    $("#physical-indicator")
+							    .addClass(
+								    "glyphicon-ok-circle");
+						    console.log("GOOD");
+						    break;
+						case "EMERGENCY":
+						    $("#physical-indicator")
+							    .removeClass(
+								    "glyphicon-ok-circle");
+						    $("#physical-indicator")
+							    .addClass(
+								    "glyphicon-remove-circle");
+						    var date = new Date(
+							    body.timeMillis);
+						    var sign = "AM";
+						    var hours = date.getHours();
+						    if (hours > 12) {
+							sign = "PM";
+							hours = hours - 12;
+						    }
 
-													var minutes = "";
-													if (date.getMinutes() < 10) {
-														minutes = "0"
-																+ date
-																		.getMinutes();
-													} else {
-														minutes = date
-																.getMinutes();
-													}
-													t.row
-															.add(
-																	[
-																			hours
-																					+ ":"
-																					+ minutes
-																					+ sign,
-																			"PHYSICAL EMERGENCY" ])
-															.draw(false);
-													console.log("EMERGENCY");
-													break;
-												default:
-													console
-															.log("Uncaught status: "
-																	+ body.physicalStatus);
-												}
-											}
-										})
-					};
-				}, delayMillis);
-		//]]>
-	</script>
+						    var minutes = "";
+						    if (date.getMinutes() < 10) {
+							minutes = "0"
+								+ date
+									.getMinutes();
+						    } else {
+							minutes = date
+								.getMinutes();
+						    }
+						    t.row
+							    .add(
+								    [
+									    hours
+										    + ":"
+										    + minutes
+										    + sign,
+									    "PHYSICAL EMERGENCY" ])
+							    .draw(false);
+						    console.log("EMERGENCY");
+						    break;
+						default:
+						    console
+							    .log("Uncaught status: "
+								    + body.physicalStatus);
+						}
+					    }
+					})
+		    };
+		}, delayMillis);
+	//]]>
+    </script>
 </body>
 </html>
