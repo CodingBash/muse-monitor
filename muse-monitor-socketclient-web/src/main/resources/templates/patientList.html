@@ -88,8 +88,7 @@
 													id="mental-indicator" aria-hidden="true"></span>
 											</div>
 											<div class="col-sm-6">
-												<span
-													class="glyphicon glyphicon-ok-circle muse-indicator"
+												<span class="glyphicon glyphicon-ok-circle muse-indicator"
 													id="physical-indicator" aria-hidden="true"></span>
 											</div>
 										</div>
@@ -162,6 +161,39 @@
 									$("#physical-indicator").addClass(
 											"glyphicon-remove-circle");
 									console.log("EMERGENCY");
+									break;
+								default:
+									console.log("Uncaught status: "
+											+ body.physicalStatus);
+								}
+
+								switch (body.mentalStatus) {
+								case "NORMAL":
+									$("#mental-indicator").removeClass(
+											"glyphicon-remove-circle");
+									$("#mental-indicator").removeClass(
+											"glyphicon-warning-sign");
+									$("#mental-indicator").addClass(
+											"glyphicon-ok-circle");
+									console.log("NORMAL");
+									break;
+								case "INTERICTAL":
+									$("#mental-indicator").removeClass(
+											"glyphicon-ok-circle");
+									$("#mental-indicator").removeClass(
+											"glyphicon-remove-circle");
+									$("#mental-indicator").addClass(
+											"glyphicon-warning-sign");
+									console.log("INTERICTAL");
+									break;
+								case "ICTAL":
+									$("#mental-indicator").removeClass(
+											"glyphicon-ok-circle");
+									$("#mental-indicator").removeClass(
+											"glyphicon-warning-sign");
+									$("#mental-indicator").addClass(
+											"glyphicon-remove-circle");
+									console.log("ICTAL");
 									break;
 								default:
 									console.log("Uncaught status: "

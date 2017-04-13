@@ -134,19 +134,20 @@ public class WebsocketController {
 			}
 		}
 		
+		// TODO: Refactor in support for interictal status
 		if (seizureFlag) {
-			outboundIndicatorPayload.setMentalStatus(MentalStatus.EMERGENCY);
-			if(previousStatus.getMentalStatus() != MentalStatus.EMERGENCY){
+			outboundIndicatorPayload.setMentalStatus(MentalStatus.ICTAL);
+			if(previousStatus.getMentalStatus() != MentalStatus.ICTAL){
 				// New status
 				newStatus = true;
-				previousStatus.setMentalStatus(MentalStatus.EMERGENCY);
+				previousStatus.setMentalStatus(MentalStatus.ICTAL);
 			}
 		} else {
-			outboundIndicatorPayload.setMentalStatus(MentalStatus.GOOD);
-			if(previousStatus.getMentalStatus() != MentalStatus.GOOD){
+			outboundIndicatorPayload.setMentalStatus(MentalStatus.NORMAL);
+			if(previousStatus.getMentalStatus() != MentalStatus.NORMAL){
 				// New status
 				newStatus = true;
-				previousStatus.setMentalStatus(MentalStatus.GOOD);
+				previousStatus.setMentalStatus(MentalStatus.NORMAL);
 			}
 		}
 		
