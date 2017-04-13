@@ -115,95 +115,79 @@
 		src="../static/node_modules/webstomp-client/dist/webstomp.min.js"
 		th:src="@{/node_modules/webstomp-client/dist/webstomp.min.js}"></script>
 	<script type="text/javascript">
-	// TODO: Heartbeat implementation
-	var url = "wss://muse-monitor-socketserver.herokuapp.com/muse-ws";
-	var clients = {
-	    a : webstomp.client(url)
-	}
+		// TODO: Heartbeat implementation
+		var url = "wss://muse-monitor-socketserver.herokuapp.com/muse-ws";
+		var clients = {
+			a : webstomp.client(url)
+		}
 
-	var jsonEncoder = {
-	    encode : function(msg) {
-		return JSON.stringify(msg);
-	    },
-	    decode : function(msg) {
-		return JSON.parse(msg);
-	    }
-	};
-	var encoder = {
-	    encode : jsonEncoder.encode,
-	    decode : jsonEncoder.decode
-	}
-	clients.a.heartbeat.outgoing = 20000; // client will send heartbeats every 20000ms
-	clients.a.heartbeat.incoming = 0;
-	clients.a.connect({}, function(evt) {
-	});
+		var jsonEncoder = {
+			encode : function(msg) {
+				return JSON.stringify(msg);
+			},
+			decode : function(msg) {
+				return JSON.parse(msg);
+			}
+		};
+		var encoder = {
+			encode : jsonEncoder.encode,
+			decode : jsonEncoder.decode
+		}
+		clients.a.heartbeat.outgoing = 20000; // client will send heartbeats every 20000ms
+		clients.a.heartbeat.incoming = 0;
+		clients.a.connect({}, function(evt) {
+		});
 
-	var delayMillis = 2000; //1 second
-	var subscriptions = {};
-	setTimeout(function() {
-	    subscriptions = {
-		indicator : clients.a.subscribe("/topic/muse-indicator",
-			function(message) {
-			    if (message.body) {
-				body = jsonEncoder.decode(message.body);
-				console.log(body);
-				switch (body.physicalStatus) {
-				case "GOOD":
-				    $("#physical-indicator").removeClass(
-					    "glyphicon-remove-circle");
-				    $("#physical-indicator").addClass(
-					    "glyphicon-ok-circle");
-				    console.log("GOOD");
-				    break;
-				case "EMERGENCY":
-				    $("#physical-indicator").removeClass(
-					    "glyphicon-ok-circle");
-				    $("#physical-indicator").addClass(
-					    "glyphicon-remove-circle");
-				    console.log("EMERGENCY");
-				    break;
-				default:
-				    console.log("Uncaught status: "
-					    + body.physicalStatus);
-				}
+		var delayMillis = 2000; //1 second
+		var subscriptions = {};
+		setTimeout(function() {
+			subscriptions = {
+				indicator : clients.a.subscribe("/topic/muse-indicator", function(message) {
+					if (message.body) {
+						body = jsonEncoder.decode(message.body);
+						console.log(body);
+						switch (body.physicalStatus) {
+							case "GOOD" :
+								$("#physical-indicator").removeClass("glyphicon-remove-circle");
+								$("#physical-indicator").addClass("glyphicon-ok-circle");
+								console.log("GOOD");
+								break;
+							case "EMERGENCY" :
+								$("#physical-indicator").removeClass("glyphicon-ok-circle");
+								$("#physical-indicator").addClass("glyphicon-remove-circle");
+								console.log("EMERGENCY");
+								break;
+							default :
+								console.log("Uncaught status: " + body.physicalStatus);
+						}
 
-				switch (body.mentalStatus) {
-				case "NORMAL":
-				    $("#mental-indicator").removeClass(
-					    "glyphicon-remove-circle");
-				    $("#mental-indicator").removeClass(
-					    "glyphicon-warning-sign");
-				    $("#mental-indicator").addClass(
-					    "glyphicon-ok-circle");
-				    console.log("NORMAL");
-				    break;
-				case "INTERICTAL":
-				    $("#mental-indicator").removeClass(
-					    "glyphicon-ok-circle");
-				    $("#mental-indicator").removeClass(
-					    "glyphicon-remove-circle");
-				    $("#mental-indicator").addClass(
-					    "glyphicon-warning-sign");
-				    console.log("INTERICTAL");
-				    break;
-				case "ICTAL":
-				    $("#mental-indicator").removeClass(
-					    "glyphicon-ok-circle");
-				    $("#mental-indicator").removeClass(
-					    "glyphicon-warning-sign");
-				    $("#mental-indicator").addClass(
-					    "glyphicon-remove-circle");
-				    console.log("ICTAL");
-				    break;
-				default:
-				    console.log("Uncaught status: "
-					    + body.physicalStatus);
-				}
-			    }
-			})
-	    };
-	}, delayMillis);
-    </script>
+						switch (body.mentalStatus) {
+							case "NORMAL" :
+								$("#mental-indicator").removeClass("glyphicon-remove-circle");
+								$("#mental-indicator").removeClass("glyphicon-warning-sign");
+								$("#mental-indicator").addClass("glyphicon-ok-circle");
+								console.log("NORMAL");
+								break;
+							case "INTERICTAL" :
+								$("#mental-indicator").removeClass("glyphicon-ok-circle");
+								$("#mental-indicator").removeClass("glyphicon-remove-circle");
+								$("#mental-indicator").addClass("glyphicon-warning-sign");
+								console.log("INTERICTAL");
+								break;
+							case "ICTAL" :
+								$("#mental-indicator").removeClass("glyphicon-ok-circle");
+								$("#mental-indicator").removeClass("glyphicon-warning-sign");
+								$("#mental-indicator").addClass("glyphicon-remove-circle");
+								console.log("ICTAL");
+								break;
+							default :
+								console.log("Uncaught status: " + body.physicalStatus);
+						}
+					}
+				})
+			};
+		}, delayMillis);
+	</script>
 	<!-- Latest compiled and minified JavaScript -->
 	<script
 		src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
