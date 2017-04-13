@@ -154,6 +154,9 @@ div[id*="graph"] {
 						<div class="row">
 							<div id="gyro-mag-graph"></div>
 						</div>
+						<div class="row">
+							<div id="eeg-graph"></div>
+						</div>
 					</div>
 					<div class="panel-footer">Panel footer</div>
 				</div>
@@ -188,7 +191,9 @@ div[id*="graph"] {
 		})
 	</script>
 	<script>
+		// ACCELERATION MAGNITUDE
 		var accel_mag_data = [ {
+			name: 'Magnitude',
 			y : [],
 			mode : 'lines',
 			marker : {
@@ -210,7 +215,9 @@ div[id*="graph"] {
 			}
 		});
 
+		// GYROSCOPE MAGNITUDE
 		var gyro_mag_data = [ {
+			name: 'Magnitude',
 			y : [],
 			mode : 'lines',
 			marker : {
@@ -231,8 +238,37 @@ div[id*="graph"] {
 				range : [ 0, 200 ]
 			}
 		});
+		
+		// EEG MAGNITUDE
+		var eeg_data = [ {
+			name: 'EEG_1',
+			y : [],
+			mode : 'lines',
+			marker : {
+				color : 'blue',
+				size : 8
+			},
+			line : {
+				width : 4
+			}
+		} ];
+		Plotly.plot('eeg-graph', eeg_data, {
+			title : 'EEG Data',
+			xaxis : {
+				range : [ 0, 50 ]
+			},
+			yaxis : {
+				title : "Value",
+				range : [ 0, 200 ]
+			}
+		});
+		
+		
+		
+		
+		// TODO: Get this resizing working...
 		window.onresize = function() {
-			Plotly.Plots.resize(gd);
+			Plotly.Plots.resize(gd); // TODO: Where's gd coming from?
 		};
 	</script>
 	<script type="text/javascript">
