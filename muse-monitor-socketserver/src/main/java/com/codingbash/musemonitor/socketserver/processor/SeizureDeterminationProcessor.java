@@ -13,7 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.codingbash.musemonitor.socketserver.model.InboundPayload;
 
 import jwave.Transform;
-import jwave.transforms.DiscreteFourierTransform;
+import jwave.transforms.WaveletPacketTransform;
+import jwave.transforms.wavelets.haar.Haar1;
 
 public class SeizureDeterminationProcessor {
 
@@ -30,8 +31,18 @@ public class SeizureDeterminationProcessor {
 		/*
 		 * Seizure Analysis
 		 */
-		// TODO: Step 1: Utilize JWave for wavelet transformation
-		Transform t = new Transform(new DiscreteFourierTransform());
+		/*
+		 * TODO: Step 1: Utilize JWave for wavelet transformation
+		 * 
+		 * Documentation: https://github.com/cscheiblich/JWave/wiki/HowTo
+		 * 
+		 * TODO: Determine which wavelet is used in EEG wavelet transform
+		 */
+		Transform t = new Transform(new WaveletPacketTransform(new Haar1()));
+
+		double[] arrHilb = t.forward(eegData); // 1-D WPT Haar forward
+
+		double[] arrReco = t.reverse(arrHilb); // 1-D WPT Haar reverse
 
 		// TODO: Step 2: Utilize pca_transform for dimensionality reduction
 
