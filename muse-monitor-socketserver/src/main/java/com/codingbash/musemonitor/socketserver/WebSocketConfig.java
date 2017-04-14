@@ -1,18 +1,17 @@
 package com.codingbash.musemonitor.socketserver;
 
-import java.util.LinkedList;
 import java.util.Queue;
 
+import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 
-import com.codingbash.musemonitor.socketserver.model.InboundPayload;
 import com.codingbash.musemonitor.socketserver.model.FallIndicatorWrapper;
+import com.codingbash.musemonitor.socketserver.model.InboundPayload;
 import com.codingbash.musemonitor.socketserver.model.PreviousStatusHolder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -50,7 +49,18 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 	
 	@Bean
 	public Queue<InboundPayload> dataQueue(){
-		return new LinkedList<InboundPayload>();
+		/*
+		 * CALCULATING SIZE OF QUEUE:
+		 * Size of queue = 20 seconds
+		 * Frequency of input data = 1000 / 30 ms = 30Hz (1/30 s)
+		 * Size = 20s / 30Hz = 600
+		 */
+		int sizeOfCircularQueue = 600;
+		
+		/*
+		 * Circular Queue Documentation: http://commons.apache.org/proper/commons-collections/javadocs/api-release/org/apache/commons/collections4/queue/CircularFifoQueue.html
+		 */
+		return new CircularFifoQueue<InboundPayload>(sizeOfCircularQueue);
 	}
 	
 	@Bean

@@ -1,5 +1,7 @@
 package com.codingbash.musemonitor.socketserver.controller;
 
+import java.util.Queue;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,12 +36,16 @@ public class WebsocketController {
 	@Autowired
 	private FallDeterminationProcessor fallDeterminationProcessor;
 
+	@Autowired
+	private Queue<InboundPayload> dataQueue;
+	
 	private static final String TOPIC_VERBOSE = "/topic/muse-verbose";
 	private static final String TOPIC_INDICATOR = "/topic/muse-indicator";
 
 	@MessageMapping("/muse-payload")
 	public void payload(InboundPayload inboundPayload) throws Exception {
 		LOG.info(gson.toJson(inboundPayload));
+		dataQueue.add(inboundPayload);
 		
 		/*
 		 * Determine status
