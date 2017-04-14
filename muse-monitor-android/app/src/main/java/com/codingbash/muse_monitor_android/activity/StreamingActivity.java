@@ -56,11 +56,17 @@ import com.codingbash.muse_monitor_android.model.OutboundPayload;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.java_websocket.WebSocket;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -151,6 +157,9 @@ public class StreamingActivity extends Activity implements OnClickListener {
     private final double[] gyroBuffer = new double[3];
     private boolean gyroStale;
 
+    private boolean streamEegData = false;
+    private double[] eegData = new double[1];
+    private int eegDataIndex = 0;
     /**
      * We will be updating the UI using a handler instead of in packet handlers because
      * packets come in at a very high frequency and it only makes sense to update the UI
@@ -164,6 +173,8 @@ public class StreamingActivity extends Activity implements OnClickListener {
      * This spinner adapter contains the MAC addresses of all of the headbands we have discovered.
      */
     private ArrayAdapter<String> spinnerAdapter;
+
+    private ArrayAdapter<CharSequence> eegSpinnerAdapter;
 
     /**
      * It is possible to pause the data transmission from the headband.  This boolean tracks whether
@@ -324,7 +335,27 @@ public class StreamingActivity extends Activity implements OnClickListener {
                 dataTransmission = !dataTransmission;
                 muse.enableDataTransmission(dataTransmission);
             }
+        } else if (v.getId() == R.id.eeg_data_button){
+            String selection = ((Spinner) findViewById(R.id.data_spinner)).getSelectedItem().toString();
+            // TODO: Bad way of setting the selection (if app is multithreaded)
+            try {
+                InputStream is = getBaseContext().getAssets().open(selection + ".txt");
+                BufferedReader r = new BufferedReader(new InputStreamReader(is));
+                String line;
+                List<Double> eegData = new LinkedList<Double>();
+                while ((line = r.readLine()) != null) {
+                    eegData.add(Double.parseDouble(line));
+                }
+                this.eegData = ArrayUtils.toPrimitive(eegData.toArray(new Double[eegData.size()]));
+                eegDataIndex = 0;
+                streamEegData = true;
+            } catch (IOException ioe){
+                ioe.printStackTrace();
+            }
+
+
         }
+        // TODO: Need a way to cancel eeg data stream
     }
 
     //--------------------------------------
@@ -410,6 +441,8 @@ public class StreamingActivity extends Activity implements OnClickListener {
                 final TextView statusText = (TextView) findViewById(R.id.con_status);
                 statusText.setText(status);
 
+                // TODO: Temporarily commenting out version string
+                /*
                 final MuseVersion museVersion = muse.getMuseVersion();
                 final TextView museVersionText = (TextView) findViewById(R.id.version);
                 // If we haven't yet connected to the headband, the version information
@@ -423,6 +456,7 @@ public class StreamingActivity extends Activity implements OnClickListener {
                 } else {
                     museVersionText.setText(R.string.undefined);
                 }
+                */
             }
         });
 
@@ -497,13 +531,24 @@ public class StreamingActivity extends Activity implements OnClickListener {
      * getValue methods.
      */
     private void getEegChannelValues(double[] buffer, MuseDataPacket p) {
-        final double eegScalar = 841.4075;
-        buffer[0] = p.getEegChannelValue(Eeg.EEG1) - eegScalar;
-        buffer[1] = p.getEegChannelValue(Eeg.EEG2) - eegScalar;
-        buffer[2] = p.getEegChannelValue(Eeg.EEG3) - eegScalar;
-        buffer[3] = p.getEegChannelValue(Eeg.EEG4) - eegScalar;
-        buffer[4] = p.getEegChannelValue(Eeg.AUX_LEFT) - eegScalar;
-        buffer[5] = p.getEegChannelValue(Eeg.AUX_RIGHT) - eegScalar;
+        if(streamEegData){
+            // TODO: Determine what buffer the single-channel value goes to
+            buffer[0] = eegData[eegDataIndex % eegData.length];
+            buffer[1] = Double.NaN;
+            buffer[2] = Double.NaN;
+            buffer[3] = Double.NaN;
+            buffer[4] = Double.NaN;
+            buffer[5] = Double.NaN;
+            eegDataIndex ++;
+        } else {
+            final double eegScalar = 841.4075;
+            buffer[0] = p.getEegChannelValue(Eeg.EEG1) - eegScalar;
+            buffer[1] = p.getEegChannelValue(Eeg.EEG2) - eegScalar;
+            buffer[2] = p.getEegChannelValue(Eeg.EEG3) - eegScalar;
+            buffer[3] = p.getEegChannelValue(Eeg.EEG4) - eegScalar;
+            buffer[4] = p.getEegChannelValue(Eeg.AUX_LEFT) - eegScalar;
+            buffer[5] = p.getEegChannelValue(Eeg.AUX_RIGHT) - eegScalar;
+        }
     }
 
     private void getAccelValues(MuseDataPacket p) {
@@ -534,10 +579,20 @@ public class StreamingActivity extends Activity implements OnClickListener {
         disconnectButton.setOnClickListener(this);
         Button pauseButton = (Button) findViewById(R.id.pause);
         pauseButton.setOnClickListener(this);
+        Button eegDataButton = (Button) findViewById(R.id.eeg_data_button);
+        eegDataButton.setOnClickListener(this);
 
         spinnerAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
         Spinner musesSpinner = (Spinner) findViewById(R.id.muses_spinner);
         musesSpinner.setAdapter(spinnerAdapter);
+
+        eegSpinnerAdapter = ArrayAdapter.createFromResource(this,
+                R.array.eeg_data, android.R.layout.simple_spinner_item);
+        eegSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        Spinner eegSpinner = (Spinner) findViewById(R.id.data_spinner);
+        eegSpinner.setAdapter(eegSpinnerAdapter);
+
+
     }
 
     /**
