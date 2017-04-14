@@ -497,12 +497,13 @@ public class StreamingActivity extends Activity implements OnClickListener {
      * getValue methods.
      */
     private void getEegChannelValues(double[] buffer, MuseDataPacket p) {
-        buffer[0] = p.getEegChannelValue(Eeg.EEG1);
-        buffer[1] = p.getEegChannelValue(Eeg.EEG2);
-        buffer[2] = p.getEegChannelValue(Eeg.EEG3);
-        buffer[3] = p.getEegChannelValue(Eeg.EEG4);
-        buffer[4] = p.getEegChannelValue(Eeg.AUX_LEFT);
-        buffer[5] = p.getEegChannelValue(Eeg.AUX_RIGHT);
+        final double eegScalar = 841.4075;
+        buffer[0] = p.getEegChannelValue(Eeg.EEG1) - eegScalar;
+        buffer[1] = p.getEegChannelValue(Eeg.EEG2) - eegScalar;
+        buffer[2] = p.getEegChannelValue(Eeg.EEG3) - eegScalar;
+        buffer[3] = p.getEegChannelValue(Eeg.EEG4) - eegScalar;
+        buffer[4] = p.getEegChannelValue(Eeg.AUX_LEFT) - eegScalar;
+        buffer[5] = p.getEegChannelValue(Eeg.AUX_RIGHT) - eegScalar;
     }
 
     private void getAccelValues(MuseDataPacket p) {
