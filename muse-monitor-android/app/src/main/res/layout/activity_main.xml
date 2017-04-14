@@ -66,7 +66,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:orientation="horizontal" >
+        android:orientation="horizontal">
+
         <Spinner
             android:id="@+id/data_spinner"
             android:layout_width="202dp"
@@ -77,7 +78,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Stream EEG" />
+            android:text="START FILE STREAM"
+            android:textSize="12dp" />
 
     </LinearLayout>
 

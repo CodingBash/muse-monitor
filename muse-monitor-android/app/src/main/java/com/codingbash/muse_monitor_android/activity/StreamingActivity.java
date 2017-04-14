@@ -336,23 +336,30 @@ public class StreamingActivity extends Activity implements OnClickListener {
                 muse.enableDataTransmission(dataTransmission);
             }
         } else if (v.getId() == R.id.eeg_data_button){
-            String selection = ((Spinner) findViewById(R.id.data_spinner)).getSelectedItem().toString();
-            // TODO: Bad way of setting the selection (if app is multithreaded)
-            try {
-                InputStream is = getBaseContext().getAssets().open(selection + ".txt");
-                BufferedReader r = new BufferedReader(new InputStreamReader(is));
-                String line;
-                List<Double> eegData = new LinkedList<Double>();
-                while ((line = r.readLine()) != null) {
-                    eegData.add(Double.parseDouble(line));
-                }
-                this.eegData = ArrayUtils.toPrimitive(eegData.toArray(new Double[eegData.size()]));
+            if(streamEegData){
+                streamEegData = false;
+                eegData = new double[1];
                 eegDataIndex = 0;
-                streamEegData = true;
-            } catch (IOException ioe){
-                ioe.printStackTrace();
+                ((Button) findViewById(R.id.eeg_data_button)).setText("START FILE STREAM");
+            } else {
+                String selection = ((Spinner) findViewById(R.id.data_spinner)).getSelectedItem().toString();
+                // TODO: Bad way of setting the selection (if app is multithreaded)
+                try {
+                    InputStream is = getBaseContext().getAssets().open(selection + ".txt");
+                    BufferedReader r = new BufferedReader(new InputStreamReader(is));
+                    String line;
+                    List<Double> eegData = new LinkedList<Double>();
+                    while ((line = r.readLine()) != null) {
+                        eegData.add(Double.parseDouble(line));
+                    }
+                    this.eegData = ArrayUtils.toPrimitive(eegData.toArray(new Double[eegData.size()]));
+                    eegDataIndex = 0;
+                    streamEegData = true;
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                }
+                ((Button) findViewById(R.id.eeg_data_button)).setText("STOP FILE STREAM");
             }
-
 
         }
         // TODO: Need a way to cancel eeg data stream
