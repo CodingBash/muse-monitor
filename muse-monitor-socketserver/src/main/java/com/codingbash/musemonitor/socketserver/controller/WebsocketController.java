@@ -43,6 +43,7 @@ public class WebsocketController {
 		
 		/*
 		 * Determine status
+		 * TODO: Change the values to enums (since seizure anaysis has three outputs)
 		 */
 		boolean fallFlag = fallDeterminationProcessor.determineFall(inboundPayload);
 		boolean seizureFlag = inboundPayload.getSeizureFlag();
