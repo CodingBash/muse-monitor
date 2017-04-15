@@ -52,9 +52,10 @@ public class SeizureDeterminationProcessor {
 				sSum += Math.log(Math.pow(decomposition[3][k], 2));
 
 			}
-			if (sSum > 20000) {
+			if (sSum > 5000) {
 				seizureFlag = true;
 			}
+			LOG.info("sSum= " + sSum);
 		}
 
 		return seizureFlag;
