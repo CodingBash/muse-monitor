@@ -162,23 +162,15 @@
 						}
 
 						switch (body.mentalStatus) {
-							case "NORMAL" :
+							case "GOOD" :
 								$("#mental-indicator").removeClass("glyphicon-remove-circle");
-								$("#mental-indicator").removeClass("glyphicon-warning-sign");
 								$("#mental-indicator").addClass("glyphicon-ok-circle");
-								console.log("NORMAL");
+								console.log("GOOD");
 								break;
-							case "INTERICTAL" :
+							case "EMERGENCY" :
 								$("#mental-indicator").removeClass("glyphicon-ok-circle");
-								$("#mental-indicator").removeClass("glyphicon-remove-circle");
-								$("#mental-indicator").addClass("glyphicon-warning-sign");
-								console.log("INTERICTAL");
-								break;
-							case "ICTAL" :
-								$("#mental-indicator").removeClass("glyphicon-ok-circle");
-								$("#mental-indicator").removeClass("glyphicon-warning-sign");
 								$("#mental-indicator").addClass("glyphicon-remove-circle");
-								console.log("ICTAL");
+								console.log("EMERGENCY");
 								break;
 							default :
 								console.log("Uncaught status: " + body.physicalStatus);

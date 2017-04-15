@@ -461,6 +461,36 @@ div[id*="graph"] {
 							default :
 								console.log("Uncaught status: " + body.physicalStatus);
 						}
+						
+						switch (body.mentalStatus) {
+							case "GOOD" :
+								$("#mental-indicator").removeClass("glyphicon-remove-circle");
+								$("#mental-indicator").addClass("glyphicon-ok-circle");
+								console.log("MENTAL GOOD");
+								break;
+							case "EMERGENCY" :
+								$("#mental-indicator").removeClass("glyphicon-ok-circle");
+								$("#mental-indicator").addClass("glyphicon-remove-circle");
+								var date = new Date(body.timeMillis);
+								var sign = "AM";
+								var hours = date.getHours();
+								if (hours > 12) {
+									sign = "PM";
+									hours = hours - 12;
+								}
+
+								var minutes = "";
+								if (date.getMinutes() < 10) {
+									minutes = "0" + date.getMinutes();
+								} else {
+									minutes = date.getMinutes();
+								}
+								t.row.add([hours + ":" + minutes + sign, "NUEROLOGICAL EMERGENCY"]).draw(false);
+								console.log("EMERGENCY");
+								break;
+							default :
+								console.log("Uncaught status: " + body.mentalStatus);
+						}
 					}
 				})
 			};
