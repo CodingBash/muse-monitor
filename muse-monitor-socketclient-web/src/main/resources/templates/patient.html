@@ -182,6 +182,8 @@ div[id*="graph"] {
 	<script src="http://d3js.org/d3.v3.min.js"></script>
 	<script
 		src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/notify/0.4.2/notify.min.js"></script>
 	<script type="text/javascript"
 		src="../static/node_modules/webstomp-client/dist/webstomp.min.js"
 		th:src="@{/node_modules/webstomp-client/dist/webstomp.min.js}"></script>
@@ -197,7 +199,7 @@ div[id*="graph"] {
 			y : [],
 			mode : 'lines',
 			marker : {
-				color : 'red',
+				color : 'purple',
 				size : 8
 			},
 			line : {
@@ -352,10 +354,10 @@ div[id*="graph"] {
 		var subscriptions = {};
 		var cnt = 0;
 		var data_holder = {
-				accel_data_holder : [[]],
-				gyro_data_holder : [[]],
-				eeg_data_holder : [[], [], [], [], [], []]
-			}
+			accel_data_holder : [[]],
+			gyro_data_holder : [[]],
+			eeg_data_holder : [[], [], [], [], [], []]
+		}
 		setTimeout(function() {
 			subscriptions = {
 				indicator : clients.a.subscribe("/topic/muse-verbose", function(message) {
@@ -418,7 +420,7 @@ div[id*="graph"] {
 										range : [eeg_data[0].y.length - x_range, eeg_data[0].y.length]
 									}
 								});
-								
+
 								// REFRESH THE DICT
 								data_holder.accel_data_holder = [[]];
 								data_holder.gyro_data_holder = [[]];
@@ -439,6 +441,10 @@ div[id*="graph"] {
 								console.log("GOOD");
 								break;
 							case "EMERGENCY" :
+								$.notify("FALL OCCURRING", {
+									className: "error",
+									position: "right bottom"
+								});
 								$("#physical-indicator").removeClass("glyphicon-ok-circle");
 								$("#physical-indicator").addClass("glyphicon-remove-circle");
 								var date = new Date(body.timeMillis);
@@ -461,7 +467,7 @@ div[id*="graph"] {
 							default :
 								console.log("Uncaught status: " + body.physicalStatus);
 						}
-						
+
 						switch (body.mentalStatus) {
 							case "GOOD" :
 								$("#mental-indicator").removeClass("glyphicon-remove-circle");
@@ -469,6 +475,10 @@ div[id*="graph"] {
 								console.log("MENTAL GOOD");
 								break;
 							case "EMERGENCY" :
+								$.notify("SEIZURE OCCURRING", {
+									className: "error",
+									position: "right bottom"
+								});
 								$("#mental-indicator").removeClass("glyphicon-ok-circle");
 								$("#mental-indicator").addClass("glyphicon-remove-circle");
 								var date = new Date(body.timeMillis);
