@@ -3,6 +3,7 @@ package com.codingbash.musemonitor.socketserver;
 import java.util.Queue;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;

@@ -5,6 +5,7 @@ import java.util.Queue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
@@ -15,6 +16,7 @@ import com.codingbash.musemonitor.socketserver.model.InboundPayload;
 import com.codingbash.musemonitor.socketserver.model.OutboundIndicatorPayload;
 import com.codingbash.musemonitor.socketserver.model.OutboundVerbosePayload;
 import com.codingbash.musemonitor.socketserver.processor.FallDeterminationProcessor;
+import com.codingbash.musemonitor.socketserver.processor.SeizureDeterminationProcessor;
 import com.google.gson.Gson;
 
 @Controller
@@ -37,8 +39,12 @@ public class WebsocketController {
 	private FallDeterminationProcessor fallDeterminationProcessor;
 
 	@Autowired
+	private SeizureDeterminationProcessor seizureDeterminationProcessor;
+
+	@Autowired
+	@Qualifier("dataQueue")
 	private Queue<InboundPayload> dataQueue;
-	
+
 	private static final String TOPIC_VERBOSE = "/topic/muse-verbose";
 	private static final String TOPIC_INDICATOR = "/topic/muse-indicator";
 
@@ -46,13 +52,13 @@ public class WebsocketController {
 	public void payload(InboundPayload inboundPayload) throws Exception {
 		LOG.info(gson.toJson(inboundPayload));
 		dataQueue.add(inboundPayload);
-		
+
 		/*
-		 * Determine status
-		 * TODO: Change the values to enums (since seizure anaysis has three outputs)
+		 * Determine status TODO: Change the values to enums (since seizure
+		 * anaysis has three outputs)
 		 */
 		boolean fallFlag = fallDeterminationProcessor.determineFall(inboundPayload);
-		boolean seizureFlag = inboundPayload.getSeizureFlag();
+		boolean seizureFlag = seizureDeterminationProcessor.determineSeizure(inboundPayload);
 
 		/*
 		 * Set indicator outbound properties

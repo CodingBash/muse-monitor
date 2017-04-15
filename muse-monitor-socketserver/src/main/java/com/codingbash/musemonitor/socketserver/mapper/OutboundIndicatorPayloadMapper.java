@@ -43,20 +43,19 @@ public class OutboundIndicatorPayloadMapper {
 			}
 		}
 
-		// TODO: Refactor in support for interictal status
 		if (seizureFlag) {
-			outboundIndicatorPayload.setMentalStatus(MentalStatus.ICTAL);
-			if (previousStatus.getMentalStatus() != MentalStatus.ICTAL) {
+			outboundIndicatorPayload.setMentalStatus(MentalStatus.EMERGENCY);
+			if (previousStatus.getMentalStatus() != MentalStatus.EMERGENCY) {
 				// New status
 				newStatus = true;
-				previousStatus.setMentalStatus(MentalStatus.ICTAL);
+				previousStatus.setMentalStatus(MentalStatus.EMERGENCY);
 			}
 		} else {
-			outboundIndicatorPayload.setMentalStatus(MentalStatus.NORMAL);
-			if (previousStatus.getMentalStatus() != MentalStatus.NORMAL) {
+			outboundIndicatorPayload.setMentalStatus(MentalStatus.GOOD);
+			if (previousStatus.getMentalStatus() != MentalStatus.GOOD) {
 				// New status
 				newStatus = true;
-				previousStatus.setMentalStatus(MentalStatus.NORMAL);
+				previousStatus.setMentalStatus(MentalStatus.GOOD);
 			}
 		}
 

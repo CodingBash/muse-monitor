@@ -12,7 +12,7 @@ import com.codingbash.musemonitor.socketserver.model.InboundPayload;
 public class FallDeterminationProcessor {
 
 	private final static Logger LOG = LoggerFactory.getLogger(FallDeterminationProcessor.class);
-	
+
 	@Autowired
 	private FallIndicatorWrapper indicators;
 
@@ -25,7 +25,7 @@ public class FallDeterminationProcessor {
 	private static final double accelUFT = 1.60;
 	private static final double accelLFT = 1.00;
 	private static final double gyroUFT = 220.0;
-	
+
 	public boolean determineFall(InboundPayload inboundPayload) {
 		boolean fallFlag = inboundPayload.getFallFlag();
 		indicators.refresh(inboundPayload.getTimeMills());
@@ -83,7 +83,7 @@ public class FallDeterminationProcessor {
 			}
 
 		}
-		
+
 		return fallFlag;
 	}
 }

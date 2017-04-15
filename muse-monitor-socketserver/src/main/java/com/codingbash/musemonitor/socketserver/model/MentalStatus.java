@@ -1,7 +1,7 @@
 package com.codingbash.musemonitor.socketserver.model;
 
 public enum MentalStatus {
-	NORMAL("NORMAL"), INTERICTAL("INTERICTAL"), ICTAL("ICTAL");
+	GOOD("GOOD"), CAUTION("CAUTION"), EMERGENCY("EMERGENCY");
 
 	private String value;
 
