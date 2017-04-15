@@ -11,9 +11,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.codingbash.musemonitor.socketserver.model.InboundPayload;
+import com.mkobos.pca_transform.PCA;
 
+import Jama.Matrix;
 import jwave.Transform;
 import jwave.transforms.WaveletPacketTransform;
+import jwave.transforms.wavelets.daubechies.Daubechies4;
 import jwave.transforms.wavelets.haar.Haar1;
 
 public class SeizureDeterminationProcessor {
@@ -28,26 +31,19 @@ public class SeizureDeterminationProcessor {
 
 		double[] eegData = retrieveEeg1ValuesInArray(dataQueue);
 
-		/*
-		 * Seizure Analysis
-		 */
-		/*
-		 * TODO: Step 1: Utilize JWave for wavelet transformation
-		 * 
-		 * Documentation: https://github.com/cscheiblich/JWave/wiki/HowTo
-		 * 
-		 * TODO: Determine which wavelet is used in EEG wavelet transform
-		 */
-		Transform t = new Transform(new WaveletPacketTransform(new Haar1()));
+		Transform t = new Transform(new WaveletPacketTransform(new Daubechies4()));
 
-		double[] arrHilb = t.forward(eegData); // 1-D WPT Haar forward
+		double[][] decomposition = t.decompose(eegData);
 
-		double[] arrReco = t.reverse(arrHilb); // 1-D WPT Haar reverse
+		int coefficients = decomposition[0].length;
+		double sSum = 0.;
+		for (int k = 0; k < coefficients; k++) {
+			sSum += Math.log(Math.pow(decomposition[3][k], 2));
 
-		// TODO: Step 2: Utilize pca_transform for dimensionality reduction
-
-		// TODO: Step 3" Utilize JAMA for custom implementation of classifier
-		// assignment
+		}
+		if (sSum > 20000) {
+			seizureFlag = true;
+		}
 
 		return seizureFlag;
 
