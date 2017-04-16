@@ -1,32 +1,162 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_patient"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.codingbash.muse_monitor_android.activity.PatientActivity">
+    android:id="@+id/scrollView1"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:paddingBottom="20dp"
+    android:paddingTop="12dp"
+    android:scrollbarStyle="outsideOverlay">
 
-    <EditText
-        android:id="@+id/patient_id_field"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="190dp"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:hint="Patient ID" />
 
-    <Button
-        android:text="Submit"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/outer_linear_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="47dp"
-        android:id="@+id/patient_id_submit"
-        android:layout_below="@+id/patient_id_field"
-        android:layout_centerHorizontal="true" />
-</RelativeLayout>
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/patient_search_linear_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/patient_search_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="If registered, please enter patient ID or patient name"
+                android:textColor="@color/colorPrimary" />
+
+            <EditText
+                android:id="@+id/search_patient_id_edittext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:ellipsize="start"
+                android:ems="10"
+                android:gravity="center_horizontal"
+                android:hint="Patient ID"
+                android:inputType="textPersonName" />
+
+
+            <TextView
+                android:id="@+id/patient_search_or"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="OR"
+                android:textAlignment="center"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                tools:text="OR" />
+
+            <EditText
+                android:id="@+id/search_patient_name_edittext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:ellipsize="start"
+                android:ems="10"
+                android:gravity="center_horizontal"
+                android:hint="Patient Name"
+                android:inputType="textPersonName" />
+
+            <Button
+                android:id="@+id/search_patient_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical|center_horizontal"
+                android:text="Submit" />
+
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="60dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/patient_register_linear_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/register_patient_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="If unregistered, please enter the patient information"
+                android:textColor="@color/colorPrimary" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp" />
+
+            <EditText
+                android:id="@+id/patient_register_patientname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:ellipsize="start"
+                android:ems="10"
+                android:gravity="center_horizontal"
+                android:hint="Patient Name"
+                android:inputType="textPersonName" />
+
+            <EditText
+                android:id="@+id/patient_register_doctorname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:ellipsize="start"
+                android:ems="10"
+                android:gravity="center_horizontal"
+                android:hint="Primary Doctor"
+                android:inputType="textPersonName" />
+
+            <EditText
+                android:id="@+id/patient_register_roomnumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:ellipsize="start"
+                android:ems="10"
+                android:gravity="center_horizontal"
+                android:hint="Room Number"
+                android:inputType="number" />
+
+            <EditText
+                android:id="@+id/patient_register_gender"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:ellipsize="start"
+                android:ems="10"
+                android:gravity="center_horizontal"
+                android:hint="Gender"
+                android:inputType="text" />
+
+            <EditText
+                android:id="@+id/patient_register_age"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:ellipsize="start"
+                android:ems="10"
+                android:gravity="center_horizontal"
+                android:hint="Age"
+                android:inputType="number" />
+
+            <Button
+                android:id="@+id/register_patient_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical|center_horizontal"
+                android:text="Submit" />
+        </LinearLayout>
+    </LinearLayout>
+
+</ScrollView>

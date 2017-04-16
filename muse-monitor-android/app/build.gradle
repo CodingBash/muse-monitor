@@ -17,11 +17,22 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    packagingOptions {
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/notice.txt'
+    }
 }
 
 repositories {
     jcenter()
     maven { url "https://jitpack.io" }
+    maven {
+        url 'https://repo.spring.io/libs-milestone'
+    }
 }
 
 dependencies {
@@ -35,6 +46,8 @@ dependencies {
     compile files('libs/libmuse_android.jar')
     compile 'com.android.support:appcompat-v7:25.0.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    compile group: 'org.springframework.android', name: 'spring-android-rest-template', version: '2.0.0.M3'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.8.8'
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
 

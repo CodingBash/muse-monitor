@@ -38,10 +38,10 @@ public class PatientController {
 	}
 
 	/*
-	 * TODO: I don't like this REST url design
+	 * TODO: I really don't like this REST url design
 	 */
-	@RequestMapping(value = "/patients", method = RequestMethod.GET)
-	public Patient retrievePatientByName(@RequestParam("patientName") String patientName) {
+	@RequestMapping(value = "/patients/name/{patientName}", method = RequestMethod.GET)
+	public Patient retrievePatientByName(@PathVariable("patientName") String patientName) {
 		Patient outPatient = patientRepository.retrievePatientByName(patientName);
 		return outPatient;
 	}
