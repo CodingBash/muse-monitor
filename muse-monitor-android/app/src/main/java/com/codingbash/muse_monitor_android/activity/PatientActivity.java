@@ -14,6 +14,8 @@ import android.widget.Toast;
 
 import com.codingbash.muse_monitor_android.R;
 import com.codingbash.muse_monitor_android.model.Patient;
+import com.codingbash.muse_monitor_android.model.PatientTO;
+import com.google.gson.Gson;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpAuthentication;
@@ -43,6 +45,8 @@ public class PatientActivity extends AppCompatActivity {
     public static final String SEARCH_PATIENT_BY_ID_URL = "http://muse-monitor-patientservice.herokuapp.com/patients/{patientId}";
 
     public static final String SEARCH_PATIENT_BY_NAME_URL = "http://muse-monitor-patientservice.herokuapp.com/patients/name/{patientName}";
+
+    public static final String REGISTER_PATIENT_URL = "https://muse-monitor-patientservice.herokuapp.com/patients";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +86,52 @@ public class PatientActivity extends AppCompatActivity {
                 }
             }
         });
+
+        Button registerPatientButton = (Button) findViewById(R.id.register_patient_button);
+        registerPatientButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                /*
+                Get Input
+                TODO: Check for required input?
+                 */
+                EditText patientNameEditText = (EditText) findViewById(R.id.patient_register_patientname);
+                String inputPatientName = StringUtils.trim(patientNameEditText.getText().toString());
+
+                EditText doctorNameEditText = (EditText) findViewById(R.id.patient_register_doctorname);
+                String inputDoctorName = StringUtils.trim(doctorNameEditText.getText().toString());
+
+                EditText roomNumberEditText = (EditText) findViewById(R.id.patient_register_roomnumber);
+                String inputRoomNumber = StringUtils.trim(roomNumberEditText.getText().toString());
+
+                EditText genderEditText = (EditText) findViewById(R.id.patient_register_gender);
+                String inputGender = StringUtils.trim(genderEditText.getText().toString());
+
+                EditText ageEditText = (EditText) findViewById(R.id.patient_register_age);
+                String inputAge = StringUtils.trim(ageEditText.getText().toString());
+
+                /*
+                Create PatientTO
+                 */
+                PatientTO patient = new PatientTO();
+                patient.setName(inputPatientName);
+                patient.setPrimaryDoctor(inputDoctorName);
+                try {
+                    patient.setRoomNumber(Integer.parseInt(inputRoomNumber));
+                } catch (IllegalArgumentException iae) {
+                    iae.printStackTrace();
+                }
+                patient.setGender(inputGender);
+
+                try {
+                    patient.setAge(Integer.parseInt(inputAge));
+                } catch (IllegalArgumentException iae) {
+                    iae.printStackTrace();
+                }
+
+                new RegisterPatientTask().execute(new Gson().toJson(patient));
+            }
+        });
     }
 
     private void goToStreamingActivity() {
@@ -107,33 +157,6 @@ public class PatientActivity extends AppCompatActivity {
         String requestUrl = SEARCH_PATIENT_BY_ID_URL.replace("{patientId}", inputPatientId);
         ResponseEntity<Patient> response = restTemplate.getForEntity(requestUrl, Patient.class);
         return response;
-        /*
-        ResponseEntity<Patient> response = restTemplate.getForEntity(requestUrl, Patient.class);
-        if(response.getStatusCode() == HttpStatus.OK){
-            String responsePatientId = response.getBody().getMongoId();
-
-            // Modularize
-
-            SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-            SharedPreferences.Editor editor = settings.edit();
-            editor.putString("patientId", responsePatientId);
-            editor.commit();
-
-            // Change Activity
-            goToStreamingActivity();
-
-        } else {
-            Context context = getApplicationContext();
-            CharSequence text = "Error - 0 patients found for ID";
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
-
-            if(patientNameEntered){
-                checkPatientName(inputPatientName);
-            }
-        }
-        */
     }
 
     private ResponseEntity<Patient> checkPatientName(String inputPatientName) {
@@ -152,29 +175,25 @@ public class PatientActivity extends AppCompatActivity {
         ResponseEntity<Patient> response = restTemplate.exchange(SEARCH_PATIENT_BY_NAME_URL, HttpMethod.GET, new HttpEntity<Object>(requestHeaders), Patient.class, inputPatientName);
         System.out.println();
         return response;
-        /*
-        ResponseEntity<Patient> response = restTemplate.getForEntity(requestUrl, Patient.class, urlParameters);
-        if(response.getStatusCode() == HttpStatus.OK){
-            String responsePatientId = response.getBody().getMongoId();
+    }
 
-            // Modularize
-
-            SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-            SharedPreferences.Editor editor = settings.edit();
-            editor.putString("patientId", responsePatientId);
-            editor.commit();
-
-            // Change Activity
-            goToStreamingActivity();
-        } else {
-            // TODO: Throw error - 0 or 2+ found for name
-            Context context = getApplicationContext();
-            CharSequence text = "Error - 0 or 2+ patients found for name";
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
-        }
-        */
+    private ResponseEntity<Patient> registerPatient(PatientTO patientTo) {
+         /*
+                    Modularize
+                     */
+        HostnameVerifier verifier = new NullHostnameVerifier();
+        MySimpleClientHttpRequestFactory factory = new MySimpleClientHttpRequestFactory(verifier);
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setRequestFactory(factory);
+        restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+        HttpAuthentication authHeader = new HttpBasicAuthentication("admin",
+                "password");
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.setAuthorization(authHeader);
+        HttpEntity<PatientTO> httpEntity = new HttpEntity<PatientTO>(patientTo);
+        ResponseEntity<Patient> response = restTemplate.exchange(REGISTER_PATIENT_URL, HttpMethod.POST, httpEntity, Patient.class);
+        System.out.println();
+        return response;
     }
 
     private class PatientSearchByIdTask extends AsyncTask<String, Void, ResponseEntity<Patient>> {
@@ -281,9 +300,55 @@ public class PatientActivity extends AppCompatActivity {
                 Log.i(TAG, "Patient Name Result: null");
             }
         }
-
     }
 
+
+    private class RegisterPatientTask extends AsyncTask<String, Void, ResponseEntity<Patient>> {
+        @Override
+        protected void onPreExecute() {
+            Log.i(TAG, "Patient registration executing");
+        }
+
+        @Override
+        protected ResponseEntity<Patient> doInBackground(String... params) {
+            try {
+                PatientTO inputPatientTo = new Gson().fromJson(params[0], PatientTO.class);
+                ResponseEntity<Patient> response = registerPatient(inputPatientTo);
+                if (response.getStatusCode() == HttpStatus.OK) {
+                    String responsePatientId = response.getBody().getMongoId();
+
+                    // Modularize
+
+                    SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+                    SharedPreferences.Editor editor = settings.edit();
+                    editor.putString("patientId", responsePatientId);
+                    editor.commit();
+
+                    // Change Activity
+                    goToStreamingActivity();
+                    return response;
+                } else {
+                    Context context = getApplicationContext();
+                    CharSequence text = "Error - Could not register patient";
+                    int duration = Toast.LENGTH_SHORT;
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.show();
+                }
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage(), e);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(ResponseEntity<Patient> result) {
+            if (result != null) {
+                Log.i(TAG, "Patient Registration Result: " + result.getBody().toString());
+            } else {
+                Log.i(TAG, "Patient Registration Result: null");
+            }
+        }
+    }
 
     public class MySimpleClientHttpRequestFactory extends SimpleClientHttpRequestFactory {
 
