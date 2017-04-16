@@ -135,6 +135,7 @@
 						<web>java $JAVA_OPTS -cp target/classes:target/dependency/*
 							MuseMonitorSocketserverApplication</web>
 					</processTypes>
+					<appName>muse-monitor-socketserver</appName>
 				</configuration>
 			</plugin>
 		</plugins>

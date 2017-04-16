@@ -13,9 +13,9 @@ public class PatientMapper {
 		patient.setAge(patientTo.getAge());
 		patient.setDiagnostic(patientTo.getDiagnostic());
 		patient.setGender(patientTo.getGender());
-		patient.setName(patient.getName());
-		patient.setPrimaryDoctor(patient.getPrimaryDoctor());
-		patient.setRoomNumber(patient.getRoomNumber());
+		patient.setName(patientTo.getName());
+		patient.setPrimaryDoctor(patientTo.getPrimaryDoctor());
+		patient.setRoomNumber(patientTo.getRoomNumber());
 		return patient;
 	}
 }
