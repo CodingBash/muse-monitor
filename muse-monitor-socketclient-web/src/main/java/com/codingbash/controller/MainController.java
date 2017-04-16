@@ -26,9 +26,6 @@ public class MainController {
 		List<Patient> patientList = patientRepository.retrieveAllPatients();
 
 		mav.addObject("patientList", patientList);
-		/*
-		 * TODO: Business logic
-		 */
 
 		return mav;
 	}
@@ -41,9 +38,6 @@ public class MainController {
 		Patient patient = patientRepository.retrievePatient(patientId);
 
 		mav.addObject("patient", patient);
-		/*
-		 * TODO: Business logic
-		 */
 
 		return mav;
 	}
