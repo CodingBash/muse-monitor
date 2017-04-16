@@ -155,8 +155,14 @@ public class PatientActivity extends AppCompatActivity {
         restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
         String requestUrl = SEARCH_PATIENT_BY_ID_URL.replace("{patientId}", inputPatientId);
-        ResponseEntity<Patient> response = restTemplate.getForEntity(requestUrl, Patient.class);
-        return response;
+        ResponseEntity<Patient> response = null;
+        try {
+            response = restTemplate.getForEntity(requestUrl, Patient.class);
+        } catch(Exception e){
+            // TODO: Catch specific exception
+            e.printStackTrace();
+        }
+            return response;
     }
 
     private ResponseEntity<Patient> checkPatientName(String inputPatientName) {
@@ -172,8 +178,14 @@ public class PatientActivity extends AppCompatActivity {
                 "password");
         HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.setAuthorization(authHeader);
-        ResponseEntity<Patient> response = restTemplate.exchange(SEARCH_PATIENT_BY_NAME_URL, HttpMethod.GET, new HttpEntity<Object>(requestHeaders), Patient.class, inputPatientName);
-        System.out.println();
+        ResponseEntity<Patient> response = null;
+        try {
+            response = restTemplate.exchange(SEARCH_PATIENT_BY_NAME_URL, HttpMethod.GET, new HttpEntity<Object>(requestHeaders), Patient.class, inputPatientName);
+        } catch (Exception e){
+            // TODO: Catch specific exception
+            e.printStackTrace();
+        }
+            System.out.println();
         return response;
     }
 
@@ -191,8 +203,14 @@ public class PatientActivity extends AppCompatActivity {
         HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.setAuthorization(authHeader);
         HttpEntity<PatientTO> httpEntity = new HttpEntity<PatientTO>(patientTo);
-        ResponseEntity<Patient> response = restTemplate.exchange(REGISTER_PATIENT_URL, HttpMethod.POST, httpEntity, Patient.class);
-        System.out.println();
+        ResponseEntity<Patient> response = null;
+        try {
+            response = restTemplate.exchange(REGISTER_PATIENT_URL, HttpMethod.POST, httpEntity, Patient.class);
+        } catch(Exception e ){
+            // TODO: Catch specific exception
+            e.printStackTrace();
+        }
+            System.out.println();
         return response;
     }
 
@@ -206,7 +224,7 @@ public class PatientActivity extends AppCompatActivity {
         protected ResponseEntity<Patient> doInBackground(String... params) {
             try {
                 ResponseEntity<Patient> response = checkPatientId(params[0], Boolean.getBoolean(params[1]), params[2]);
-                if (response.getStatusCode() == HttpStatus.OK) {
+                if (response != null && response.getStatusCode() == HttpStatus.OK) {
                     String responsePatientId = response.getBody().getMongoId();
 
                     // Modularize
@@ -221,11 +239,16 @@ public class PatientActivity extends AppCompatActivity {
                     return response;
 
                 } else {
-                    Context context = getApplicationContext();
-                    CharSequence text = "Error - 0 patients found for ID";
-                    int duration = Toast.LENGTH_SHORT;
-                    Toast toast = Toast.makeText(context, text, duration);
-                    toast.show();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Context context = getApplicationContext();
+                            CharSequence text = "Error - 0 patients found for ID";
+                            int duration = Toast.LENGTH_SHORT;
+                            Toast toast = Toast.makeText(context, text, duration);
+                            toast.show();
+                        }
+                    });
 
                     if (Boolean.getBoolean(params[1])) {
                         checkPatientName(params[2]);
@@ -264,7 +287,7 @@ public class PatientActivity extends AppCompatActivity {
                 } else {
                     Log.i(TAG, "Patient Name Result: null");
                 }
-                if (response.getStatusCode() == HttpStatus.OK) {
+                if (response != null && response.getStatusCode() == HttpStatus.OK) {
                     String responsePatientId = response.getBody().getMongoId();
 
                     // Modularize
@@ -279,11 +302,16 @@ public class PatientActivity extends AppCompatActivity {
                     return response;
                 } else {
                     // TODO: Throw error - 0 or 2+ found for name
-                    Context context = getApplicationContext();
-                    CharSequence text = "Error - 0 or 2+ patients found for name";
-                    int duration = Toast.LENGTH_SHORT;
-                    Toast toast = Toast.makeText(context, text, duration);
-                    toast.show();
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            Context context = getApplicationContext();
+                            CharSequence text = "Error - 0 or 2+ patients found for name";
+                            int duration = Toast.LENGTH_SHORT;
+                            Toast toast = Toast.makeText(context, text, duration);
+                            toast.show();
+                        }
+                    });
+
                 }
             } catch (Exception e) {
                 TODO:
@@ -328,11 +356,17 @@ public class PatientActivity extends AppCompatActivity {
                     goToStreamingActivity();
                     return response;
                 } else {
-                    Context context = getApplicationContext();
-                    CharSequence text = "Error - Could not register patient";
-                    int duration = Toast.LENGTH_SHORT;
-                    Toast toast = Toast.makeText(context, text, duration);
-                    toast.show();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Context context = getApplicationContext();
+                            CharSequence text = "Error - Could not register patient";
+                            int duration = Toast.LENGTH_SHORT;
+                            Toast toast = Toast.makeText(context, text, duration);
+                            toast.show();
+                        }
+                    });
+
                 }
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage(), e);
