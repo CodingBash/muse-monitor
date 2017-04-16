@@ -83,11 +83,11 @@
 										<div class="row" style="padding-top: 10px;">
 											<div class="col-sm-6">
 												<span class="glyphicon glyphicon-ban-circle muse-indicator"
-													id="mental-indicator" aria-hidden="true"></span>
+													id="mental-indicator" th:id="'mental-indicator-' + ${patient.mongoId}" aria-hidden="true"></span>
 											</div>
 											<div class="col-sm-6">
 												<span class="glyphicon glyphicon-ban-circle muse-indicator"
-													id="physical-indicator" aria-hidden="true"></span>
+													id="physical-indicator" th:id="'physical-indicator-' + ${patient.mongoId}" aria-hidden="true"></span>
 											</div>
 										</div>
 
@@ -148,8 +148,9 @@
 						console.log(body);
 						switch (body.physicalStatus) {
 							case "GOOD" :
-								$("#physical-indicator").removeClass("glyphicon-remove-circle");
-								$("#physical-indicator").addClass("glyphicon-ok-circle");
+								$("#physical-indicator-"+ body.patientId).removeClass("glyphicon-ban-circle");
+								$("#physical-indicator-"+ body.patientId).removeClass("glyphicon-remove-circle");
+								$("#physical-indicator-"+ body.patientId).addClass("glyphicon-ok-circle");
 								console.log("GOOD");
 								break;
 							case "EMERGENCY" :
@@ -157,8 +158,9 @@
 									className : "error",
 									position : "right bottom"
 								});
-								$("#physical-indicator").removeClass("glyphicon-ok-circle");
-								$("#physical-indicator").addClass("glyphicon-remove-circle");
+								$("#physical-indicator-"+ body.patientId).removeClass("glyphicon-ban-circle");
+								$("#physical-indicator-" + body.patientId).removeClass("glyphicon-ok-circle");
+								$("#physical-indicator-" + body.patientId).addClass("glyphicon-remove-circle");
 								console.log("EMERGENCY");
 								break;
 							default :
@@ -167,8 +169,9 @@
 
 						switch (body.mentalStatus) {
 							case "GOOD" :
-								$("#mental-indicator").removeClass("glyphicon-remove-circle");
-								$("#mental-indicator").addClass("glyphicon-ok-circle");
+								$("#mental-indicator-"+ body.patientId).removeClass("glyphicon-ban-circle");
+								$("#mental-indicator-"+ body.patientId).removeClass("glyphicon-remove-circle");
+								$("#mental-indicator-"+ body.patientId).addClass("glyphicon-ok-circle");
 								console.log("GOOD");
 								break;
 							case "EMERGENCY" :
@@ -176,12 +179,13 @@
 									className : "error",
 									position : "right bottom"
 								});
-								$("#mental-indicator").removeClass("glyphicon-ok-circle");
-								$("#mental-indicator").addClass("glyphicon-remove-circle");
+								$("#mental-indicator-"+ body.patientId).removeClass("glyphicon-ban-circle");
+								$("#mental-indicator-"+ body.patientId).removeClass("glyphicon-ok-circle");
+								$("#mental-indicator-"+ body.patientId).addClass("glyphicon-remove-circle");
 								console.log("EMERGENCY");
 								break;
 							default :
-								console.log("Uncaught status: " + body.physicalStatus);
+								console.log("Uncaught status: " + body.mentalStatus);
 						}
 					}
 				})
