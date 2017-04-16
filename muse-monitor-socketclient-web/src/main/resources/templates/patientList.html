@@ -75,7 +75,12 @@
 									<div class="col-sm-8">
 										<h1 th:text="${patient.name}">Basheer Becerra</h1>
 										<p style="font-size: 1.2em;">
-											Room <span th:text="${patient.roomNumber}">A104</span>
+											<strong>Patient ID: </strong> <span
+												th:text="${patient.mongoId}">A104</span><br /> <strong>Primary
+												Doctor: </strong> <span th:text="${patient.primaryDoctor}">A104</span><br />
+											<strong>Room: </strong> <span th:text="${patient.roomNumber}">A104</span><br />
+											<strong>Gender: </strong><span th:text="${patient.gender}">A104</span><br />
+											<strong>Age: </strong><span th:text="${patient.age}">A104</span>
 										</p>
 									</div>
 									<div class="col-sm-4 text-center">
@@ -126,8 +131,6 @@
 	/*<![CDATA[*/
 	
 	    var patientList = [[${patientList}]];
-	
-	    var patient = [[${patient}]];
 	    
 	    function findPatientName(patientId){
 	    	var patientName = "";
