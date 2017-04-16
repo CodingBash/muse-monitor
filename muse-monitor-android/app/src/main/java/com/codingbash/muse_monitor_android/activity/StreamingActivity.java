@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
@@ -206,6 +207,9 @@ public class StreamingActivity extends Activity implements OnClickListener {
     // Lifecycle / Connection code
 
 
+    private static final String PREFS_NAME = "MUSE-MONITOR-PREFERENCES";
+    private SharedPreferences settings;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -229,6 +233,7 @@ public class StreamingActivity extends Activity implements OnClickListener {
         // we can connect to.
         manager.setMuseListener(new MuseL(weakActivity));
 
+        settings = getSharedPreferences(PREFS_NAME, 0);
         // Muse 2016 (MU-02) headbands use Bluetooth Low Energy technology to
         // simplify the connection process.  This requires access to the COARSE_LOCATION
         // or FINE_LOCATION permissions.  Make sure we have these permissions before
@@ -259,11 +264,26 @@ public class StreamingActivity extends Activity implements OnClickListener {
         Log.d(TAG, "STOMP connected");
     }
 
+    @Override
     protected void onPause() {
         super.onPause();
         // It is important to call stopListening when the Activity is paused
         // to avoid a resource leak from the LibMuse library.
         manager.stopListening();
+        if (muse != null) {
+            muse.disconnect();
+        }
+        mStompClient.disconnect();
+        handler.removeCallbacks(tickUiAndSocket);
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+
+        manager.startListening();
+        initStomp();
+        handler.post(tickUiAndSocket);
     }
 
     public boolean isBluetoothEnabled() {
@@ -713,7 +733,7 @@ public class StreamingActivity extends Activity implements OnClickListener {
         if (updated && payload != null) {
             payload.setFallFlag(false);
             payload.setSeizureFlag(false);
-            payload.setPatientId("123456"); // TODO: Hard coded
+            payload.setPatientId(settings.getString("patientId", "123456")); // TODO: Hard coded
             payload.setTimeMills(System.currentTimeMillis());
             mStompClient.send(STOMP_APP_SEND, gson.toJson(payload)).subscribe();
             Log.v(TAG, "SENT: " + gson.toJson(payload));
