@@ -417,8 +417,8 @@ div[id*="graph"] {
 								data_holder.eeg_data_holder[5].push(eeg_point.auxRight);
 	
 								// REFRESH PLOTLY GRAPHS
-								if (cnt % 20 == 0) {
-									var x_range = 100;
+								if (cnt % 50 == 0) {
+									var x_range = 200;
 	
 									// ADD TO ACCELLERATION
 									Plotly.extendTraces('accel-mag-graph', {
