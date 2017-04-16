@@ -125,11 +125,15 @@ div[id*="graph"] {
 								<div class="row" style="padding-top: 10px;">
 									<div class="col-sm-6">
 										<span class="glyphicon glyphicon-ban-circle muse-indicator"
-											id="mental-indicator" th:id="'mental-indicator-' + ${patient.mongoId}" aria-hidden="true"></span>
+											id="mental-indicator"
+											th:id="'mental-indicator-' + ${patient.mongoId}"
+											aria-hidden="true"></span>
 									</div>
 									<div class="col-sm-6">
 										<span class="glyphicon glyphicon-ban-circle muse-indicator"
-											id="physical-indicator" th:id="'physical-indicator-' + ${patient.mongoId}" aria-hidden="true"></span>
+											id="physical-indicator"
+											th:id="'physical-indicator-' + ${patient.mongoId}"
+											aria-hidden="true"></span>
 									</div>
 								</div>
 
@@ -331,6 +335,26 @@ div[id*="graph"] {
 		//	Plotly.Plots.resize(gd); // TODO: Where's gd coming from?
 		//};
 	</script>
+	<script th:inline="javascript">
+	/*<![CDATA[*/
+	
+	    var patientList = [[${patientList}]];
+	
+	    var patient = [[${patient}]];
+	    
+	    function findPatientName(patientId){
+	    	var patientName = "";
+	    	patientList.forEach(function(thisPatient){
+	    		if(thisPatient.mongoId == patientId){
+	    			patientName = thisPatient.name;
+	    			return;
+	    		}
+	    	});
+	    	return patientName;
+	    }
+	/*]]>*/
+	</script>
+
 	<script type="text/javascript">
 		// TODO: Heartbeat implementation
 		//<![CDATA[
@@ -369,71 +393,73 @@ div[id*="graph"] {
 				indicator : clients.a.subscribe("/topic/muse-verbose", function(message) {
 					if (message.body) {
 						body = jsonEncoder.decode(message.body);
-						accel_point = body.accelerometerData[0];
-						gyro_point = body.gyroscopeData[0];
-						eeg_point = body.eegData[0];
-						//console.log(body); 
-						if (cnt % 1 == 0) {
-							// ADD ALL DATA TO DATA HOLDER
-							data_holder.accel_data_holder[0].push(Math.sqrt(Math.pow(accel_point.accelX, 2) + Math.pow(accel_point.accelY, 2) + Math.pow(accel_point.accelZ, 2)));
-							data_holder.gyro_data_holder[0].push(Math.sqrt(Math.pow(gyro_point.gyroX, 2) + Math.pow(gyro_point.gyroY, 2) + Math.pow(gyro_point.gyroZ, 2)));
-							data_holder.eeg_data_holder[0].push(eeg_point.eeg1);
-							data_holder.eeg_data_holder[1].push(eeg_point.eeg2);
-							data_holder.eeg_data_holder[2].push(eeg_point.eeg3);
-							data_holder.eeg_data_holder[3].push(eeg_point.eeg4);
-							data_holder.eeg_data_holder[4].push(eeg_point.auxLeft);
-							data_holder.eeg_data_holder[5].push(eeg_point.auxRight);
-
-							// REFRESH PLOTLY GRAPHS
-							if (cnt % 20 == 0) {
-								var x_range = 100;
-
-								// ADD TO ACCELLERATION
-								Plotly.extendTraces('accel-mag-graph', {
-									y : data_holder.accel_data_holder
-								}, [0]);
-								accel_mag_data[0].y = accel_mag_data[0].y.slice(Math.max(accel_mag_data[0].y.length - x_range, 0));
-								Plotly.relayout("accel-mag-graph", {
-									xaxis : {
-										range : [accel_mag_data[0].y.length - x_range, accel_mag_data[0].y.length]
-									}
-								});
-
-								// ADD TO GYRO
-								Plotly.extendTraces('gyro-mag-graph', {
-									y : data_holder.gyro_data_holder
-								}, [0]);
-								gyro_mag_data[0].y = gyro_mag_data[0].y.slice(Math.max(gyro_mag_data[0].y.length - x_range, 0));
-								Plotly.relayout("gyro-mag-graph", {
-									xaxis : {
-										range : [gyro_mag_data[0].y.length - x_range, gyro_mag_data[0].y.length]
-									}
-								});
-
-								// ADD TO EEG
-								// TODO: Do rest of traces + independent axis
-								Plotly.extendTraces('eeg-graph', {
-									y : data_holder.eeg_data_holder
-								}, [0, 1, 2, 3, 4, 5]);
-								eeg_data[0].y = eeg_data[0].y.slice(Math.max(eeg_data[0].y.length - x_range, 0));
-								eeg_data[1].y = eeg_data[1].y.slice(Math.max(eeg_data[1].y.length - x_range, 0));
-								eeg_data[2].y = eeg_data[2].y.slice(Math.max(eeg_data[2].y.length - x_range, 0));
-								eeg_data[3].y = eeg_data[3].y.slice(Math.max(eeg_data[3].y.length - x_range, 0));
-								eeg_data[4].y = eeg_data[4].y.slice(Math.max(eeg_data[4].y.length - x_range, 0));
-								eeg_data[5].y = eeg_data[5].y.slice(Math.max(eeg_data[5].y.length - x_range, 0));
-								Plotly.relayout("eeg-graph", {
-									xaxis : {
-										range : [eeg_data[0].y.length - x_range, eeg_data[0].y.length]
-									}
-								});
-
-								// REFRESH THE DICT
-								data_holder.accel_data_holder = [[]];
-								data_holder.gyro_data_holder = [[]];
-								data_holder.eeg_data_holder = [[], [], [], [], [], []];
+						if(body.patientId == patient.mongoId){
+							accel_point = body.accelerometerData[0];
+							gyro_point = body.gyroscopeData[0];
+							eeg_point = body.eegData[0];
+							//console.log(body); 
+							if (cnt % 1 == 0) {
+								// ADD ALL DATA TO DATA HOLDER
+								data_holder.accel_data_holder[0].push(Math.sqrt(Math.pow(accel_point.accelX, 2) + Math.pow(accel_point.accelY, 2) + Math.pow(accel_point.accelZ, 2)));
+								data_holder.gyro_data_holder[0].push(Math.sqrt(Math.pow(gyro_point.gyroX, 2) + Math.pow(gyro_point.gyroY, 2) + Math.pow(gyro_point.gyroZ, 2)));
+								data_holder.eeg_data_holder[0].push(eeg_point.eeg1);
+								data_holder.eeg_data_holder[1].push(eeg_point.eeg2);
+								data_holder.eeg_data_holder[2].push(eeg_point.eeg3);
+								data_holder.eeg_data_holder[3].push(eeg_point.eeg4);
+								data_holder.eeg_data_holder[4].push(eeg_point.auxLeft);
+								data_holder.eeg_data_holder[5].push(eeg_point.auxRight);
+	
+								// REFRESH PLOTLY GRAPHS
+								if (cnt % 20 == 0) {
+									var x_range = 100;
+	
+									// ADD TO ACCELLERATION
+									Plotly.extendTraces('accel-mag-graph', {
+										y : data_holder.accel_data_holder
+									}, [0]);
+									accel_mag_data[0].y = accel_mag_data[0].y.slice(Math.max(accel_mag_data[0].y.length - x_range, 0));
+									Plotly.relayout("accel-mag-graph", {
+										xaxis : {
+											range : [accel_mag_data[0].y.length - x_range, accel_mag_data[0].y.length]
+										}
+									});
+	
+									// ADD TO GYRO
+									Plotly.extendTraces('gyro-mag-graph', {
+										y : data_holder.gyro_data_holder
+									}, [0]);
+									gyro_mag_data[0].y = gyro_mag_data[0].y.slice(Math.max(gyro_mag_data[0].y.length - x_range, 0));
+									Plotly.relayout("gyro-mag-graph", {
+										xaxis : {
+											range : [gyro_mag_data[0].y.length - x_range, gyro_mag_data[0].y.length]
+										}
+									});
+	
+									// ADD TO EEG
+									// TODO: Do rest of traces + independent axis
+									Plotly.extendTraces('eeg-graph', {
+										y : data_holder.eeg_data_holder
+									}, [0, 1, 2, 3, 4, 5]);
+									eeg_data[0].y = eeg_data[0].y.slice(Math.max(eeg_data[0].y.length - x_range, 0));
+									eeg_data[1].y = eeg_data[1].y.slice(Math.max(eeg_data[1].y.length - x_range, 0));
+									eeg_data[2].y = eeg_data[2].y.slice(Math.max(eeg_data[2].y.length - x_range, 0));
+									eeg_data[3].y = eeg_data[3].y.slice(Math.max(eeg_data[3].y.length - x_range, 0));
+									eeg_data[4].y = eeg_data[4].y.slice(Math.max(eeg_data[4].y.length - x_range, 0));
+									eeg_data[5].y = eeg_data[5].y.slice(Math.max(eeg_data[5].y.length - x_range, 0));
+									Plotly.relayout("eeg-graph", {
+										xaxis : {
+											range : [eeg_data[0].y.length - x_range, eeg_data[0].y.length]
+										}
+									});
+	
+									// REFRESH THE DICT
+									data_holder.accel_data_holder = [[]];
+									data_holder.gyro_data_holder = [[]];
+									data_holder.eeg_data_holder = [[], [], [], [], [], []];
+								}
 							}
+							cnt++;
 						}
-						cnt++;
 					}
 				}),
 				indicator : clients.a.subscribe("/topic/muse-indicator", function(message) {
@@ -448,29 +474,31 @@ div[id*="graph"] {
 								console.log("GOOD");
 								break;
 							case "EMERGENCY" :
-								$.notify("FALL OCCURRING", {
+								$.notify(findPatientName(body.patientId).toUpperCase() + " FALL DETECTED", {
 									className : "error",
 									position : "right bottom"
 								});
 								$("#physical-indicator-"+ body.patientId).removeClass("glyphicon-ban-circle");
 								$("#physical-indicator-" + body.patientId).removeClass("glyphicon-ok-circle");
 								$("#physical-indicator-" + body.patientId).addClass("glyphicon-remove-circle");
-								var date = new Date(body.timeMillis);
-								var sign = "AM";
-								var hours = date.getHours();
-								if (hours > 12) {
-									sign = "PM";
-									hours = hours - 12;
+								if(body.patientId == patient.mongoId){
+									var date = new Date(body.timeMillis);
+									var sign = "AM";
+									var hours = date.getHours();
+									if (hours > 12) {
+										sign = "PM";
+										hours = hours - 12;
+									}
+		
+									var minutes = "";
+									if (date.getMinutes() < 10) {
+										minutes = "0" + date.getMinutes();
+									} else {
+										minutes = date.getMinutes();
+									}
+									t.row.add([hours + ":" + minutes + sign, "PHYSICAL EMERGENCY"]).draw(false);
+									console.log("EMERGENCY");
 								}
-
-								var minutes = "";
-								if (date.getMinutes() < 10) {
-									minutes = "0" + date.getMinutes();
-								} else {
-									minutes = date.getMinutes();
-								}
-								t.row.add([hours + ":" + minutes + sign, "PHYSICAL EMERGENCY"]).draw(false);
-								console.log("EMERGENCY");
 								break;
 							default :
 								console.log("Uncaught status: " + body.physicalStatus);
@@ -484,29 +512,31 @@ div[id*="graph"] {
 								console.log("MENTAL GOOD");
 								break;
 							case "EMERGENCY" :
-								$.notify("SEIZURE OCCURRING", {
+								$.notify(findPatientName(body.patientId).toUpperCase() + " SEIZURE DETECTED", {
 									className : "error",
 									position : "right bottom"
 								});
 								$("#mental-indicator-"+ body.patientId).removeClass("glyphicon-ban-circle");
 								$("#mental-indicator-"+ body.patientId).removeClass("glyphicon-ok-circle");
 								$("#mental-indicator-"+ body.patientId).addClass("glyphicon-remove-circle");
-								var date = new Date(body.timeMillis);
-								var sign = "AM";
-								var hours = date.getHours();
-								if (hours > 12) {
-									sign = "PM";
-									hours = hours - 12;
+								if(body.patientId == patient.mongoId){
+									var date = new Date(body.timeMillis);
+									var sign = "AM";
+									var hours = date.getHours();
+									if (hours > 12) {
+										sign = "PM";
+										hours = hours - 12;
+									}
+	
+									var minutes = "";
+									if (date.getMinutes() < 10) {
+										minutes = "0" + date.getMinutes();
+									} else {
+										minutes = date.getMinutes();
+									}
+									t.row.add([hours + ":" + minutes + sign, "NUEROLOGICAL EMERGENCY"]).draw(false);
+									console.log("EMERGENCY");
 								}
-
-								var minutes = "";
-								if (date.getMinutes() < 10) {
-									minutes = "0" + date.getMinutes();
-								} else {
-									minutes = date.getMinutes();
-								}
-								t.row.add([hours + ":" + minutes + sign, "NUEROLOGICAL EMERGENCY"]).draw(false);
-								console.log("EMERGENCY");
 								break;
 							default :
 								console.log("Uncaught status: " + body.mentalStatus);

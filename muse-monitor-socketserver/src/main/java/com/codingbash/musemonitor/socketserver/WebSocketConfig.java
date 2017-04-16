@@ -3,6 +3,7 @@ package com.codingbash.musemonitor.socketserver;
 import java.util.Queue;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -65,7 +66,16 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 	}
 	
 	@Bean
-	public Queue<OutboundIndicatorPayload> indicatorQueue(){
+	@Qualifier("mentalIndicatorQueue")
+	public Queue<OutboundIndicatorPayload> mentalIndicatorQueue(){
+		int sizeOfCircularQueue = 10;
+		
+		return new CircularFifoQueue<OutboundIndicatorPayload>(sizeOfCircularQueue);
+	}
+	
+	@Bean
+	@Qualifier("physicalIndicatorQueue")
+	public Queue<OutboundIndicatorPayload> physicalIndicatorQueue(){
 		int sizeOfCircularQueue = 10;
 		
 		return new CircularFifoQueue<OutboundIndicatorPayload>(sizeOfCircularQueue);

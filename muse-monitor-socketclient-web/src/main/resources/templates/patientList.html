@@ -67,13 +67,16 @@
 			</div>
 			<div class="col-sm-9 col-lg-10">
 				<div class="row" th:each="patient : ${patientList}">
-					<a href="patient.html" th:href="@{/patients/{patientId}(patientId=${patient.mongoId})}">
+					<a href="patient.html"
+						th:href="@{/patients/{patientId}(patientId=${patient.mongoId})}">
 						<div class="panel panel-default">
 							<div class="panel-heading">
 								<div class="row">
-									<div class="col-sm-8"> 
+									<div class="col-sm-8">
 										<h1 th:text="${patient.name}">Basheer Becerra</h1>
-										<p style="font-size: 1.2em;">Room <span th:text="${patient.roomNumber}">A104</span></p>
+										<p style="font-size: 1.2em;">
+											Room <span th:text="${patient.roomNumber}">A104</span>
+										</p>
 									</div>
 									<div class="col-sm-4 text-center">
 										<div class="row">
@@ -83,11 +86,15 @@
 										<div class="row" style="padding-top: 10px;">
 											<div class="col-sm-6">
 												<span class="glyphicon glyphicon-ban-circle muse-indicator"
-													id="mental-indicator" th:id="'mental-indicator-' + ${patient.mongoId}" aria-hidden="true"></span>
+													id="mental-indicator"
+													th:id="'mental-indicator-' + ${patient.mongoId}"
+													aria-hidden="true"></span>
 											</div>
 											<div class="col-sm-6">
 												<span class="glyphicon glyphicon-ban-circle muse-indicator"
-													id="physical-indicator" th:id="'physical-indicator-' + ${patient.mongoId}" aria-hidden="true"></span>
+													id="physical-indicator"
+													th:id="'physical-indicator-' + ${patient.mongoId}"
+													aria-hidden="true"></span>
 											</div>
 										</div>
 
@@ -114,8 +121,31 @@
 		th:src="@{/node_modules/webstomp-client/dist/webstomp.min.js}"></script>
 	<script
 		src="https://cdnjs.cloudflare.com/ajax/libs/notify/0.4.2/notify.min.js"></script>
+
+	<script th:inline="javascript">
+	/*<![CDATA[*/
+	
+	    var patientList = [[${patientList}]];
+	
+	    var patient = [[${patient}]];
+	    
+	    function findPatientName(patientId){
+	    	var patientName = "";
+	    	patientList.forEach(function(thisPatient){
+	    		if(thisPatient.mongoId == patientId){
+	    			patientName = thisPatient.name;
+	    			return;
+	    		}
+	    	});
+	    	return patientName;
+	    }
+	/*]]>*/
+	</script>
+
 	<script type="text/javascript">
 		// TODO: Heartbeat implementation
+		
+		
 		var url = "wss://muse-monitor-socketserver.herokuapp.com/muse-ws";
 		var clients = {
 			a : webstomp.client(url)
@@ -154,7 +184,7 @@
 								console.log("GOOD");
 								break;
 							case "EMERGENCY" :
-								$.notify("FALL OCCURRING", {
+								$.notify(findPatientName(body.patientId).toUpperCase() + " FALL DETECTED", {
 									className : "error",
 									position : "right bottom"
 								});
@@ -175,7 +205,7 @@
 								console.log("GOOD");
 								break;
 							case "EMERGENCY" :
-								$.notify("SEIZURE OCCURRING", {
+								$.notify(findPatientName(body.patientId).toUpperCase() + " SEIZURE DETECTED", {
 									className : "error",
 									position : "right bottom"
 								});

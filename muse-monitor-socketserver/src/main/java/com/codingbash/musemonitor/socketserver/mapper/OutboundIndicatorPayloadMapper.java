@@ -7,6 +7,7 @@ import java.util.Queue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import com.codingbash.musemonitor.socketserver.model.InboundPayload;
@@ -21,44 +22,59 @@ public class OutboundIndicatorPayloadMapper {
 	private final static Logger LOG = LoggerFactory.getLogger(OutboundIndicatorPayloadMapper.class);
 
 	@Autowired
-	private Queue<OutboundIndicatorPayload> indicatorQueue;
+	@Qualifier("physicalIndicatorQueue")
+	private Queue<OutboundIndicatorPayload> physicalIndicatorQueue;
+
+	@Autowired
+	@Qualifier("mentalIndicatorQueue")
+	private Queue<OutboundIndicatorPayload> mentalIndicatorQueue;
 
 	public OutboundIndicatorPayload mapOutboundIndicatorPayload(InboundPayload inboundPayload, boolean fallFlag,
 			boolean seizureFlag) {
 		OutboundIndicatorPayload outboundIndicatorPayload = new OutboundIndicatorPayload();
 		outboundIndicatorPayload.setPatientId(inboundPayload.getPatientId());
-		boolean newStatus = false;
+
+		PhysicalStatus newPhysicalStatus = null;
+		MentalStatus newMentalStatus = null;
+		boolean physicalNewStatus = false;
+		boolean mentalNewStatus = false;
 		if (fallFlag) {
-			outboundIndicatorPayload.setPhysicalStatus(PhysicalStatus.EMERGENCY);
-			if (checkPhysicalStatus(indicatorQueue, inboundPayload, PhysicalStatus.EMERGENCY)) {
+			newPhysicalStatus = PhysicalStatus.EMERGENCY;
+			if (checkPhysicalStatus(physicalIndicatorQueue, inboundPayload, PhysicalStatus.EMERGENCY)) {
 				// New status
-				newStatus = true;
+				physicalNewStatus = true;
 			}
 		} else {
-			outboundIndicatorPayload.setPhysicalStatus(PhysicalStatus.GOOD);
-			if (checkPhysicalStatus(indicatorQueue, inboundPayload, PhysicalStatus.GOOD)) {
+			newPhysicalStatus = PhysicalStatus.GOOD;
+			if (checkPhysicalStatus(physicalIndicatorQueue, inboundPayload, PhysicalStatus.GOOD)) {
 				// New status
-				newStatus = true;
+				physicalNewStatus = true;
 			}
 		}
 
 		if (seizureFlag) {
-			outboundIndicatorPayload.setMentalStatus(MentalStatus.EMERGENCY);
-			if (checkMentalStatus(indicatorQueue, inboundPayload, MentalStatus.EMERGENCY)) {
+			newMentalStatus = MentalStatus.EMERGENCY;
+			if (checkMentalStatus(mentalIndicatorQueue, inboundPayload, MentalStatus.EMERGENCY)) {
 				// New status
-				newStatus = true;
+				mentalNewStatus = true;
 			}
 		} else {
-			outboundIndicatorPayload.setMentalStatus(MentalStatus.GOOD);
-			if (checkMentalStatus(indicatorQueue, inboundPayload, MentalStatus.GOOD)) {
+			newMentalStatus = MentalStatus.GOOD;
+			if (checkMentalStatus(mentalIndicatorQueue, inboundPayload, MentalStatus.GOOD)) {
 				// New status
-				newStatus = true;
+				mentalNewStatus = true;
 			}
 		}
-		System.out.println("NEWSTATUS" + newStatus);
-		if (newStatus) {
+		if (physicalNewStatus || mentalNewStatus) {
 			outboundIndicatorPayload.setTimeMillis(inboundPayload.getTimeMills());
-			indicatorQueue.add(outboundIndicatorPayload);
+			if (physicalNewStatus) {
+				outboundIndicatorPayload.setPhysicalStatus(newPhysicalStatus);
+				physicalIndicatorQueue.add(outboundIndicatorPayload);
+			}
+			if (mentalNewStatus) {
+				outboundIndicatorPayload.setMentalStatus(newMentalStatus);
+				mentalIndicatorQueue.add(outboundIndicatorPayload);
+			}
 		}
 		return outboundIndicatorPayload;
 	}
@@ -68,41 +84,18 @@ public class OutboundIndicatorPayloadMapper {
 		List<OutboundIndicatorPayload> list = new ArrayList<OutboundIndicatorPayload>(indicatorQueue);
 
 		if (!list.isEmpty()) {
-			/*
-			 * Check if target status is different from last status change
-			 */
-			if (list.get(list.size() - 1).getPhysicalStatus() != status) {
-				if (list.size() > 1) {
-					/*
-					 * Find the last status change that is the same as the
-					 * target status
-					 */
-					for (int i = list.size() - 2; i >= 0; i--) {
-						if (list.get(i).getPhysicalStatus() == status) {
-							/*
-							 * If the last synonymous status change was more
-							 * than 3 seconds ago, send indicator change
-							 */
-							if (inboundPayload.getTimeMills() - list.get(i).getTimeMillis() > 3 * 1000) {
-								return true;
-							} else {
-								break;
-							}
-						}
-						return true;
-					}
-				} else {
-					/*
-					 * There is only one saved indicator and it is different
-					 */
-					return true;
-				}
-
+			if (list.get(list.size() - 1).getPhysicalStatus() != status
+					&& inboundPayload.getTimeMills() - list.get(list.size() - 1).getTimeMillis() > 3 * 1000) {
+				return true;
+			} else {
+				return false;
 			}
 		} else {
+			/*
+			 * If list is empty, return new indicator
+			 */
 			return true;
 		}
-		return false;
 	}
 
 	private boolean checkMentalStatus(Queue<OutboundIndicatorPayload> indicatorQueue, InboundPayload inboundPayload,
@@ -110,40 +103,17 @@ public class OutboundIndicatorPayloadMapper {
 		List<OutboundIndicatorPayload> list = new ArrayList<OutboundIndicatorPayload>(indicatorQueue);
 
 		if (!list.isEmpty()) {
-			/*
-			 * Check if target status is different from last status change
-			 */
-			if (list.get(list.size() - 1).getMentalStatus() != status) {
-				if (list.size() > 1) {
-					/*
-					 * Find the last status change that is the same as the
-					 * target status
-					 */
-					for (int i = list.size() - 2; i >= 0; i--) {
-						if (list.get(i).getMentalStatus() == status) {
-							/*
-							 * If the last synonymous status change was more
-							 * than 3 seconds ago, send indicator change
-							 */
-							if (inboundPayload.getTimeMills() - list.get(i).getTimeMillis() > 3 * 1000) {
-								return true;
-							} else {
-								break;
-							}
-						}
-						return true;
-					}
-				} else {
-					/*
-					 * There is only one saved indicator and it is different
-					 */
-					return true;
-				}
-
+			if (list.get(list.size() - 1).getMentalStatus() != status
+					&& inboundPayload.getTimeMills() - list.get(list.size() - 1).getTimeMillis() > 3 * 1000) {
+				return true;
+			} else {
+				return false;
 			}
 		} else {
+			/*
+			 * If list is empty, return new indicator
+			 */
 			return true;
 		}
-		return false;
 	}
 }
