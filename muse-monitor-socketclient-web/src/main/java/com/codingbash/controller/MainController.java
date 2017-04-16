@@ -36,9 +36,11 @@ public class MainController {
 		mav.setViewName("patient");
 
 		Patient patient = patientRepository.retrievePatient(patientId);
+		List<Patient> patientList = patientRepository.retrieveAllPatients();
 
 		mav.addObject("patient", patient);
-
+		mav.addObject("patientList", patientList);
+		
 		return mav;
 	}
 }
