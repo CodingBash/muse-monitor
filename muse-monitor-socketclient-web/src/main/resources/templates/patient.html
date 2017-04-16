@@ -92,7 +92,7 @@ div[id*="graph"] {
 							<ul class="nav navbar-nav">
 								<li class="dropdown"><a class="dropdown-toggle"
 									data-toggle="dropdown" href="#">Patients <b class="caret"></b></a>
-																		<ul class="dropdown-menu" th:each="patient : ${patientList}">
+									<ul class="dropdown-menu" th:each="patient : ${patientList}">
 										<li><a
 											th:href="@{/patients/{patientId}(patientId=${patient.mongoId})}"><span
 												th:text="${patient.name}">Basheer Becerra</span></a></li>
@@ -107,12 +107,15 @@ div[id*="graph"] {
 				</nav>
 			</div>
 			<div class="col-sm-9 col-lg-10">
+				<div></div>
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<div class="row">
 							<div class="col-sm-8">
 								<h1 th:text="${patient.name}">Basheer Becerra</h1>
-								<p style="font-size: 1.2em;">Room <span th:text="${patient.roomNumber}">A104</span></p>
+								<p style="font-size: 1.2em;">
+									Room <span th:text="${patient.roomNumber}">A104</span>
+								</p>
 							</div>
 							<div class="col-sm-4 text-center">
 								<div class="row">
@@ -156,7 +159,12 @@ div[id*="graph"] {
 							<div id="eeg-graph"></div>
 						</div>
 					</div>
-					<div class="panel-footer">Panel footer</div>
+					<div class="panel-footer">
+						<ul class="pager">
+							<li class="previous"><a th:href="@{/patients}"><span
+									class="glyphicon glyphicon-menu-left"></span> Patient List</a></li>
+						</ul>
+					</div>
 				</div>
 				<div class="row"></div>
 
@@ -440,8 +448,8 @@ div[id*="graph"] {
 								break;
 							case "EMERGENCY" :
 								$.notify("FALL OCCURRING", {
-									className: "error",
-									position: "right bottom"
+									className : "error",
+									position : "right bottom"
 								});
 								$("#physical-indicator").removeClass("glyphicon-ok-circle");
 								$("#physical-indicator").addClass("glyphicon-remove-circle");
@@ -474,8 +482,8 @@ div[id*="graph"] {
 								break;
 							case "EMERGENCY" :
 								$.notify("SEIZURE OCCURRING", {
-									className: "error",
-									position: "right bottom"
+									className : "error",
+									position : "right bottom"
 								});
 								$("#mental-indicator").removeClass("glyphicon-ok-circle");
 								$("#mental-indicator").addClass("glyphicon-remove-circle");
