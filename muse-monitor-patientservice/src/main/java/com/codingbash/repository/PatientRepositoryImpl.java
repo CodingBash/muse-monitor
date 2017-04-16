@@ -19,10 +19,15 @@ public class PatientRepositoryImpl implements PatientRepository {
 	}
 
 	@Override
-	public Patient retrievePatient(String patientId) {
+	public Patient retrievePatientById(String patientId) {
 		return repo.findByMongoId(patientId);
 	}
 
+	@Override
+	public Patient retrievePatientByName(String patientName) {
+		return repo.findByName(patientName);
+	}
+	
 	@Override
 	public List<Patient> retrieveAllPatients() {
 		return repo.findAll();

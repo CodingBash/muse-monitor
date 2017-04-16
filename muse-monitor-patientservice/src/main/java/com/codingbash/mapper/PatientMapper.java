@@ -1,5 +1,6 @@
 package com.codingbash.mapper;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import com.codingbash.model.Patient;
@@ -12,9 +13,9 @@ public class PatientMapper {
 		Patient patient = new Patient();
 		patient.setAge(patientTo.getAge());
 		patient.setDiagnostic(patientTo.getDiagnostic());
-		patient.setGender(patientTo.getGender());
-		patient.setName(patientTo.getName());
-		patient.setPrimaryDoctor(patientTo.getPrimaryDoctor());
+		patient.setGender(StringUtils.trim(patientTo.getGender()));
+		patient.setName(StringUtils.trim(patientTo.getName()));
+		patient.setPrimaryDoctor(StringUtils.trim(patientTo.getPrimaryDoctor()));
 		patient.setRoomNumber(patientTo.getRoomNumber());
 		return patient;
 	}
