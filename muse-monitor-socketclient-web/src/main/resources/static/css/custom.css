@@ -1,6 +1,7 @@
 body {
 	background-color: #eee;
 }
+
 .panel {
 	border: 1px solid #222222;
 	transition: box-shadow 0.5s;
@@ -70,5 +71,10 @@ body {
 
 .glyphicon-remove-circle {
 	color: #ff0000;
+	-webkit-font-smoothing: antialiased;
+}
+
+.glyphicon-ban-circle {
+	color: #ffff00;
 	-webkit-font-smoothing: antialiased;
 }
