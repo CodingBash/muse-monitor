@@ -23,7 +23,7 @@ public class FallDeterminationProcessor {
 	private GyroscopeProcessor gyroscopeProcessor;
 
 	private static final double accelUFT = 1.60;
-	private static final double accelLFT = 1.00;
+	private static final double accelLFT = 0.85;
 	private static final double gyroUFT = 220.0;
 
 	public boolean determineFall(InboundPayload inboundPayload) {

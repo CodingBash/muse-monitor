@@ -411,7 +411,7 @@ div[id*="graph"] {
 							gyro_point = body.gyroscopeData[0];
 							eeg_point = body.eegData[0];
 							//console.log(body); 
-							if (cnt % 1 == 0) {
+							if (cnt % 2 == 0) {
 								// ADD ALL DATA TO DATA HOLDER
 								data_holder.accel_data_holder[0].push(Math.sqrt(Math.pow(accel_point.accelX, 2) + Math.pow(accel_point.accelY, 2) + Math.pow(accel_point.accelZ, 2)));
 								data_holder.gyro_data_holder[0].push(Math.sqrt(Math.pow(gyro_point.gyroX, 2) + Math.pow(gyro_point.gyroY, 2) + Math.pow(gyro_point.gyroZ, 2)));
@@ -423,7 +423,7 @@ div[id*="graph"] {
 								data_holder.eeg_data_holder[5].push(eeg_point.auxRight);
 	
 								// REFRESH PLOTLY GRAPHS
-								if (cnt % 50 == 0) {
+								if (cnt % 75 == 0) {
 									var x_range = 200;
 	
 									// ADD TO ACCELLERATION
