@@ -5,7 +5,7 @@ The project is divided into four main components
 - Muse Monitor: Socket Server
 - Muse Monitor: Socket Client (Web)
 
-This components can be seen by the image below
+This components can be seen by the image below <br/>
 <img src="img/architecture.png" width="500">
 
 ## Muse Monitor: Android
