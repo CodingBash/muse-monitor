@@ -31,6 +31,7 @@ Muse Monitor will be dependent on the following third party software interfaces 
 - Muse SDK – For utilizing the Muse Headband interface, [source]( http://www.choosemuse.com/developer-kit/)
 - Android SDK – For building the Android application, [source](https://developer.android.com/index.html)
 - StompProtocolAndroid - For connecting to the STOMP protocol and the Android device, [source](https://github.com/NaikSoftware/StompProtocolAndroid)
+- Spring Android - Framework that provides Spring functionality to the Android SDK, [source](http://projects.spring.io/spring-android/)
 - Spring MVC - For serving the front-end pages for the web client, [source](https://spring.io/guides/gs/serving-web-content/)
 - Spring Boot - Framework for building modern Spring applications, [source](https://projects.spring.io/spring-boot/)
 - Spring Websockets - For creating a Spring websocket server, [source](https://spring.io/guides/gs/messaging-stomp-websocket/)
