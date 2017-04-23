@@ -5,7 +5,8 @@ The project is divided into four main components
 - Muse Monitor: Socket Server
 - Muse Monitor: Socket Client (Web)
 
-This components can be seen by the label below
+This components can be seen by the image below
+<img src="img/architecture.png" width="500">
 
 ## Muse Monitor: Android
 The "Muse Monitor: Android" project contains the code to run the Android application which interacts with the patient's Muse Headband. "Muse Monitor: Android" directly communicates with the Muse Headband, "Muse Monitor: Patient Service", and the "Muse Monitor: Socket Server" components. The Android application communicates with the "Muse Monitor: Patient Service" component to register and retrieve patient information. The Android application communicates with the "Muse Monitor: Socket Server" component to stream the Muse Headband data.
